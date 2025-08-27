@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Gastos</title>
+    <style>
+        /* Reset e Configurações Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        /* Cards Breakdown */
+        .cards-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .card-total {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-total:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-name {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-limit {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-small {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-small .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #ed8936, #e53e3e);
+            transition: width 0.5s ease;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                grid-template-columns: 400px 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h3::before {
+            font-size: 1.5rem;
+        }
+
+        .limits-card h3::before { content: '⚙️'; }
+        .expense-form-card h3::before { content: '💳'; }
+        .expense-list-card h3::before { content: '📊'; }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: #f7fafc;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+            min-height: 44px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+            width: 100%;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+            gap: 0.25rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-tab {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: #718096;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 36px;
+        }
+
+        .filter-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: #edf2f7;
+            color: #4a5568;
+        }
+
+        /* Expense List */
+        .expense-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .expense-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .expense-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .expense-list::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        .expense-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .expense-item:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .expense-info {
+            flex: 1;
+        }
+
+        .expense-description {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .expense-card-badge {
+            font-size: 0.75rem;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            display: inline-block;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .expense-card-badge.Nubank { background: linear-gradient(135deg, #8a2be2, #9b59b6); }
+        .expense-card-badge.Itaú { background: linear-gradient(135deg, #ff8c00, #f39c12); }
+
+        .expense-amount {
+            font-weight: 700;
+            color: #e53e3e;
+            font-size: 1.125rem;
+            text-align: right;
+        }
+
+        /* Alerts */
+        .alerts-container {
+            margin-bottom: 2rem;
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            text-align: center;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: #fffbf0;
+            color: #b7791f;
+            border-color: #f6ad55;
+        }
+
+        .alert-danger {
+            background: #fed7d7;
+            color: #c53030;
+            border-color: #f56565;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .no-expenses {
+            text-align: center;
+            color: #a0aec0;
+            font-style: italic;
+            padding: 2rem;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 2px dashed #e2e8f0;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #48bb78;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            min-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            border-left-color: #e53e3e;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 767px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .cards-breakdown {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            .card {
+                padding: 1.25rem;
+            }
+            
+            .main-content {
+                gap: 1.5rem;
+            }
+            
+            .notification {
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+                transform: translateY(-100%);
+            }
+            
+            .notification.show {
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .filter-tabs {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .filter-tab {
+                border-radius: 6px;
+            }
+            
+            .expense-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .expense-amount {
+                text-align: left;
+                font-size: 1.25rem;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>💳 Controle de Gastos</h1>
+            </div>
+            
+            <div class="cards-breakdown">
+                <div class="card-total">
+                    <div class="card-name">Nubank</div>
+                    <div class="card-amount" id="nubankTotal">R$ 0,00</div>
+                    <div class="card-limit" id="nubankLimitText">Limite: R$ 0,00</div>
+                    <div class="progress-bar-small">
+                        <div class="progress" id="nubankProgress"></div>
+                    </div>
+                </div>
+                <div class="card-total">
+                    <div class="card-name">Itaú</div>
+                    <div class="card-amount" id="itauTotal">R$ 0,00</div>
+                    <div class="card-limit" id="itauLimitText">Limite: R$ 0,00</div>
+                    <div class="progress-bar-small">
+                        <div class="progress" id="itauProgress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alerts-container" id="alertContainer"></div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="card limits-card">
+                    <h3>Definir Limites</h3>
+                    <div class="form-group">
+                        <label for="nubankLimitInput">Limite Nubank (R$)</label>
+                        <input type="number" id="nubankLimitInput" class="form-control" placeholder="Ex: 1500" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="itauLimitInput">Limite Itaú (R$)</label>
+                        <input type="number" id="itauLimitInput" class="form-control" placeholder="Ex: 1500" step="0.01">
+                    </div>
+                    <button class="btn btn-secondary" id="setLimitsBtn">Definir Limites</button>
+                </div>
+
+                <div class="card expense-form-card">
+                    <h3>Registrar Gasto</h3>
+                    <form id="expenseForm">
+                        <div class="form-group">
+                            <label for="descriptionInput">Descrição</label>
+                            <input type="text" id="descriptionInput" class="form-control" placeholder="Ex: Supermercado, Uber..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="amountInput">Valor (R$)</label>
+                            <input type="number" id="amountInput" class="form-control" placeholder="0,00" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cardSelect">Cartão</label>
+                            <select id="cardSelect" class="form-control">
+                                <option value="Nubank">Nubank</option>
+                                <option value="Itaú">Itaú</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrar Gasto</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="main-area">
+                <div class="card expense-list-card">
+                    <h3>Gastos Recentes</h3>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="todos">Todos</button>
+                        <button class="filter-tab" data-filter="Nubank">Nubank</button>
+                        <button class="filter-tab" data-filter="Itaú">Itaú</button>
+                    </div>
+                    <div class="expense-list" id="expenseList"></div>
+                    <button class="btn btn-secondary" id="clearExpensesBtn">Limpar Todos os Gastos</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ExpenseTracker = {
+            // Estado da aplicação armazenado em memória
+            state: {
+                expenses: [],
+                limits: {
+                    Nubank: 0,
+                    Itaú: 0,
+                },
+                currentFilter: 'todos',
+            },
+
+            // Cache dos elementos DOM
+            elements: {},
+
+            // Inicialização da aplicação
+            init() {
+                this.cacheElements();
+                this.bindEvents();
+                this.render();
+                console.log('🚀 Controle de Gastos inicializado com sucesso!');
+            },
+
+            // Cache dos elementos DOM para melhor performance
+            cacheElements() {
+                this.elements = {
+                    nubank: {
+                        total: document.getElementById('nubankTotal'),
+                        limitText: document.getElementById('nubankLimitText'),
+                        progress: document.getElementById('nubankProgress'),
+                        limitInput: document.getElementById('nubankLimitInput'),
+                    },
+                    
+                    itau: {
+                        total: document.getElementById('itauTotal'),
+                        limitText: document.getElementById('itauLimitText'),
+                        progress: document.getElementById('itauProgress'),
+                        limitInput: document.getElementById('itauLimitInput'),
+                    },
+                    
+                    setLimitsBtn: document.getElementById('setLimitsBtn'),
+                    expenseForm: document.getElementById('expenseForm'),
+                    descriptionInput: document.getElementById('descriptionInput'),
+                    amountInput: document.getElementById('amountInput'),
+                    cardSelect: document.getElementById('cardSelect'),
+                    expenseList: document.getElementById('expenseList'),
+                    clearExpensesBtn: document.getElementById('clearExpensesBtn'),
+                    alertContainer: document.getElementById('alertContainer'),
+                    filterTabs: document.querySelector('.filter-tabs'),
+                };
+            },
+
+            // Vinculação de eventos
+            bindEvents() {
+                this.elements.setLimitsBtn.addEventListener('click', (e) => this.handleSetLimits(e));
+                this.elements.expenseForm.addEventListener('submit', (e) => this.handleAddExpense(e));
+                this.elements.clearExpensesBtn.addEventListener('click', (e) => this.handleClearExpenses(e));
+                this.elements.filterTabs.addEventListener('click', (e) => this.handleFilter(e));
+            },
+
+            // Manipuladores de eventos
+            handleSetLimits(e) {
+                e.preventDefault();
+                
+                const nubank = parseFloat(this.elements.nubank.limitInput.value) || 0;
+                const itau = parseFloat(this.elements.itau.limitInput.value) || 0;
+
+                if (nubank === 0 && itau === 0) {
+                    this.showNotification('Por favor, defina pelo menos um limite.', 'error');
+                    return;
+                }
+
+                this.state.limits = { 
+                    Nubank: nubank || this.state.limits.Nubank, 
+                    Itaú: itau || this.state.limits.Itaú 
+                };
+
+                this.showNotification('Limites definidos com sucesso! 🎯', 'success');
+                this.render();
+            },
+
+            handleAddExpense(event) {
+                event.preventDefault();
+                
+                const description = this.elements.descriptionInput.value.trim();
+                const amount = parseFloat(this.elements.amountInput.value);
+                const card = this.elements.cardSelect.value;
+
+                // Validação
+                if (!description) {
+                    this.showNotification('Por favor, insira uma descrição.', 'error');
+                    return;
+                }
+
+                if (!amount || amount <= 0) {
+                    this.showNotification('Por favor, insira um valor válido.', 'error');
+                    return;
+                }
+
+                if (amount > 10000) {
+                    if (!confirm('Valor muito alto! Tem certeza que deseja registrar este gasto?')) {
+                        return;
+                    }
+                }
+
+                const newExpense = {
+                    id: Date.now(),
+                    description,
+                    amount,
+                    card,
+                    date: new Date().toLocaleDateString('pt-BR'),
+                    timestamp: new Date()
+                };
+
+                this.state.expenses.unshift(newExpense);
+                this.elements.expenseForm.reset();
+                this.showNotification(`Gasto de ${this.utils.formatCurrency(amount)} registrado! 💸`, 'success');
+                this.render();
+            },
+
+            handleClearExpenses() {
+                if (this.state.expenses.length === 0) {
+                    this.showNotification('Não há gastos para remover.', 'error');
+                    return;
+                }
+
+                if (confirm('⚠️ Tem certeza que deseja apagar todos os gastos? Esta ação não pode ser desfeita.')) {
+                    this.state.expenses = [];
+                    this.showNotification('Todos os gastos foram removidos. 🗑️', 'success');
+                    this.render();
+                }
+            },
+
+            handleFilter(event) {
+                if (event.target.classList.contains('filter-tab')) {
+                    this.state.currentFilter = event.target.dataset.filter;
+                    this.render();
+                }
+            },
+
+            // Renderização principal
+            render() {
+                this.updateTotals();
+                this.updateProgressBars();
+                this.renderExpenseList();
+                this.renderAlerts();
+                this.updateFormInputs();
+                this.updateFilterTabs();
+            },
+
+            updateTotals() {
+                const totals = this.calculateTotals();
+                const { formatCurrency } = this.utils;
+                
+                this.elements.nubank.total.textContent = formatCurrency(totals.Nubank);
+                this.elements.itau.total.textContent = formatCurrency(totals.Itaú);
+                
+                this.elements.nubank.limitText.textContent = `Limite: ${formatCurrency(this.state.limits.Nubank)}`;
+                this.elements.itau.limitText.textContent = `Limite: ${formatCurrency(this.state.limits.Itaú)}`;
+            },
+
+            updateProgressBars() {
+                const totals = this.calculateTotals();
+                const { calculatePercentage } = this.utils;
+
+                this.elements.nubank.progress.style.width = calculatePercentage(totals.Nubank, this.state.limits.Nubank);
+                this.elements.itau.progress.style.width = calculatePercentage(totals.Itaú, this.state.limits.Itaú);
+            },
+
+            renderExpenseList() {
+                const filtered = this.getFilteredExpenses();
+                
+                if (filtered.length === 0) {
+                    const message = this.state.currentFilter === 'todos' 
+                        ? '🤷‍♂️ Nenhum gasto registrado ainda.<br><small>Comece adicionando seus gastos!</small>'
+                        : `📭 Nenhum gasto no ${this.state.currentFilter}.<br><small>Tente outro filtro!</small>`;
+                        
+                    this.elements.expenseList.innerHTML = `<div class="no-expenses">${message}</div>`;
+                    return;
+                }
+
+                this.elements.expenseList.innerHTML = filtered.map((expense, index) => `
+                    <div class="expense-item" style="animation: slideIn 0.3s ease ${index * 0.1}s both">
+                        <div class="expense-info">
+                            <div class="expense-description">${this.utils.escapeHtml(expense.description)}</div>
+                            <span class="expense-card-badge ${expense.card}">${expense.card}</span>
+                        </div>
+                        <div class="expense-amount">${this.utils.formatCurrency(expense.amount)}</div>
+                    </div>
+                `).join('');
+            },
+
+            renderAlerts() {
+                const totals = this.calculateTotals();
+                const alerts = this.generateAlerts(totals);
+
+                this.elements.alertContainer.innerHTML = alerts.map(alert => `
+                    <div class="alert alert-${alert.type}">${alert.message}</div>
+                `).join('');
+            },
+
+            updateFormInputs() {
+                const { limits } = this.state;
+                
+                // Só atualiza se o campo estiver vazio
+                if (!this.elements.nubank.limitInput.value && limits.Nubank > 0) {
+                    this.elements.nubank.limitInput.value = limits.Nubank;
+                }
+                if (!this.elements.itau.limitInput.value && limits.Itaú > 0) {
+                    this.elements.itau.limitInput.value = limits.Itaú;
+                }
+            },
+
+            updateFilterTabs() {
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.filter === this.state.currentFilter);
+                });
+            },
+
+            // Funções auxiliares
+            calculateTotals() {
+                return {
+                    Nubank: this.state.expenses.filter(e => e.card === 'Nubank').reduce((sum, exp) => sum + exp.amount, 0),
+                    Itaú: this.state.expenses.filter(e => e.card === 'Itaú').reduce((sum, exp) => sum + exp.amount, 0),
+                };
+            },
+
+            getFilteredExpenses() {
+                return this.state.expenses.filter(expense => 
+                    this.state.currentFilter === 'todos' || expense.card === this.state.currentFilter
+                );
+            },
+
+            generateAlerts(totals) {
+                const alerts = [];
+                const { limits } = this.state;
+
+                // Alertas por cartão
+                ['Nubank', 'Itaú'].forEach(card => {
+                    if (limits[card] > 0) {
+                        const percentage = (totals[card] / limits[card]) * 100;
+                        
+                        if (percentage >= 100) {
+                            alerts.push({
+                                type: 'danger',
+                                message: `🚨 ${card.toUpperCase()}: Limite estourado! Pare de usar este cartão!`
+                            });
+                        } else if (percentage >= 90) {
+                            alerts.push({
+                                type: 'warning',
+                                message: `🔥 ${card.toUpperCase()}: Quase estourando! ${Math.round(percentage)}% usado.`
+                            });
+                        } else if (percentage >= 80) {
+                            alerts.push({
+                                type: 'warning',
+                                message: `⚠️ ${card.toUpperCase()}: Você usou ${Math.round(percentage)}% do limite.`
+                            });
+                        }
+                    }
+                });
+
+                return alerts;
+            },
+
+            showNotification(message, type = 'success') {
+                // Remove notificação anterior se existir
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+
+                const notification = document.createElement('div');
+                notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+                notification.textContent = message;
+
+                document.body.appendChild(notification);
+
+                // Anima a entrada
+                requestAnimationFrame(() => {
+                    notification.classList.add('show');
+                });
+
+                // Remove após 4 segundos
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 4000);
+            },
+
+            // Utilitários
+            utils: {
+                formatCurrency(value) {
+                    return new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    }).format(value);
+                },
+
+                calculatePercentage(value, limit) {
+                    if (limit <= 0) return '0%';
+                    return `${Math.min((value / limit) * 100, 100)}%`;
+                },
+
+                escapeHtml(text) {
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                }
+            }
+        };
+
+        // Inicialização quando o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                ExpenseTracker.init();
+            } catch (error) {
+                console.error('Erro ao inicializar o aplicativo:', error);
+                // Fallback simples em caso de erro
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #e53e3e;">
+                        <h2>⚠️ Erro ao carregar o aplicativo</h2>
+                        <p>Por favor, recarregue a página.</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
