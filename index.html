@@ -1,12 +1,45 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Gastos - Login</title>
     <style>
-    * {
+        :root {
+            --primary-color: #667eea;
+            --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+            --secondary-color: #4a5568;
+            --background-color: #f5f7fa;
+            --background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-background: #ffffff;
+            --text-color: #2d3748;
+            --text-muted: #718096;
+            --border-color: #e2e8f0;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --danger-color: #e53e3e;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #667eea;
+            --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+            --secondary-color: #a0aec0;
+            --background-color: #1a202c;
+            --background-gradient: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            --card-background: #2d3748;
+            --text-color: #f7fafc;
+            --text-muted: #a0aec0;
+            --border-color: #4a5568;
+            --success-color: #68d391;
+            --warning-color: #f6ad55;
+            --danger-color: #fc8181;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -14,16 +47,40 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: var(--background-gradient);
             min-height: 100vh;
-            color: #2d3748;
+            color: var(--text-color);
             line-height: 1.6;
+            transition: all 0.3s ease;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-background);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
         }
 
         /* Login Screen */
@@ -36,24 +93,25 @@
         }
 
         .login-card {
-            background: white;
+            background: var(--card-background);
             padding: 3rem;
             border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-lg);
             width: 100%;
             max-width: 400px;
             text-align: center;
+            border: 1px solid var(--border-color);
         }
 
         .login-title {
             font-size: 2rem;
             margin-bottom: 0.5rem;
-            color: #2d3748;
+            color: var(--text-color);
             font-weight: 700;
         }
 
         .login-subtitle {
-            color: #718096;
+            color: var(--text-muted);
             margin-bottom: 2rem;
             font-size: 1rem;
         }
@@ -66,7 +124,7 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #4a5568;
+            color: var(--text-color);
             font-weight: 600;
             font-size: 0.9rem;
         }
@@ -74,22 +132,21 @@
         .form-control {
             width: 100%;
             padding: 1rem;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 1rem;
             transition: all 0.2s ease;
-            background: #f7fafc;
+            background: var(--card-background);
+            color: var(--text-color);
         }
 
         .form-control:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            background: white;
         }
 
         .btn {
-            width: 100%;
             padding: 1rem;
             border: none;
             border-radius: 8px;
@@ -101,8 +158,9 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--primary-gradient);
             color: white;
+            width: 100%;
         }
 
         .btn-primary:hover {
@@ -111,29 +169,54 @@
         }
 
         .btn-secondary {
-            background: #f7fafc;
-            color: #4a5568;
-            border: 2px solid #e2e8f0;
+            background: var(--card-background);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            width: 100%;
         }
 
         .btn-secondary:hover {
-            background: #edf2f7;
-            border-color: #cbd5e0;
+            border-color: var(--primary-color);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-edit {
+            background: var(--warning-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+
+        .btn-edit:hover {
+            background: #dd6b20;
         }
 
         .user-info {
-            background: rgba(102, 126, 234, 0.1);
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: var(--shadow);
         }
 
         .logout-btn {
             padding: 0.5rem 1rem;
-            background: #e53e3e;
+            background: var(--danger-color);
             color: white;
             border: none;
             border-radius: 6px;
@@ -148,12 +231,12 @@
 
         /* Main App Styles */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             border-radius: 16px;
             color: white;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-lg);
         }
 
         .header-content {
@@ -236,16 +319,16 @@
         }
 
         .card {
-            background: white;
+            background: var(--card-background);
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
             margin-bottom: 1.5rem;
         }
 
         .card h3 {
-            color: #2d3748;
+            color: var(--text-color);
             margin-bottom: 1.5rem;
             font-size: 1.25rem;
             font-weight: 700;
@@ -264,12 +347,12 @@
 
         .filter-tabs {
             display: flex;
-            background: #f7fafc;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 0.25rem;
             margin-bottom: 1.5rem;
             gap: 0.25rem;
-            border: 1px solid #e2e8f0;
         }
 
         .filter-tab {
@@ -278,7 +361,7 @@
             border: none;
             border-radius: 6px;
             background: transparent;
-            color: #718096;
+            color: var(--text-muted);
             font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
@@ -287,14 +370,44 @@
         }
 
         .filter-tab.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--primary-gradient);
             color: white;
             box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
 
         .filter-tab:hover:not(.active) {
-            background: #edf2f7;
-            color: #4a5568;
+            background: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .category-select {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-btn {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            background: var(--card-background);
+            color: var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .category-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .category-btn:hover:not(.active) {
+            border-color: var(--primary-color);
         }
 
         .expense-list {
@@ -308,30 +421,34 @@
         }
 
         .expense-list::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: var(--border-color);
             border-radius: 3px;
         }
 
         .expense-list::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
+            background: var(--text-muted);
             border-radius: 3px;
         }
 
         .expense-item {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 0.75rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             transition: all 0.2s ease;
         }
 
         .expense-item:hover {
-            background: #edf2f7;
-            border-color: #cbd5e0;
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .expense-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
         }
 
         .expense-info {
@@ -340,8 +457,16 @@
 
         .expense-description {
             font-weight: 600;
-            color: #2d3748;
+            color: var(--text-color);
             margin-bottom: 0.25rem;
+        }
+
+        .expense-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 0.5rem;
         }
 
         .expense-card-badge {
@@ -358,11 +483,33 @@
         .expense-card-badge.Nubank { background: linear-gradient(135deg, #8a2be2, #9b59b6); }
         .expense-card-badge.Itaú { background: linear-gradient(135deg, #ff8c00, #f39c12); }
 
+        .expense-category-badge {
+            font-size: 0.75rem;
+            background: var(--border-color);
+            color: var(--text-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .expense-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
         .expense-amount {
             font-weight: 700;
-            color: #e53e3e;
+            color: var(--danger-color);
             font-size: 1.125rem;
             text-align: right;
+            margin-bottom: 0.5rem;
+        }
+
+        .expense-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
         }
 
         .alerts-container {
@@ -379,15 +526,15 @@
         }
 
         .alert-warning {
-            background: #fffbf0;
-            color: #b7791f;
-            border-color: #f6ad55;
+            background: rgba(237, 137, 54, 0.1);
+            color: var(--warning-color);
+            border-color: var(--warning-color);
         }
 
         .alert-danger {
-            background: #fed7d7;
-            color: #c53030;
-            border-color: #f56565;
+            background: rgba(229, 62, 62, 0.1);
+            color: var(--danger-color);
+            border-color: var(--danger-color);
             animation: shake 0.5s ease-in-out;
         }
 
@@ -399,27 +546,28 @@
 
         .no-expenses {
             text-align: center;
-            color: #a0aec0;
+            color: var(--text-muted);
             font-style: italic;
             padding: 2rem;
-            background: #f7fafc;
+            background: var(--card-background);
             border-radius: 8px;
-            border: 2px dashed #e2e8f0;
+            border: 2px dashed var(--border-color);
         }
 
         .notification {
             position: fixed;
-            top: 20px;
+            top: 80px;
             right: 20px;
             padding: 1rem 1.5rem;
-            background: white;
+            background: var(--card-background);
             border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border-left: 4px solid #48bb78;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--success-color);
             z-index: 1000;
             transform: translateX(100%);
             transition: transform 0.3s ease;
             min-width: 300px;
+            color: var(--text-color);
         }
 
         .notification.show {
@@ -427,7 +575,75 @@
         }
 
         .notification.error {
-            border-left-color: #e53e3e;
+            border-left-color: var(--danger-color);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: var(--card-background);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.7);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--border-color);
+            color: var(--text-color);
         }
 
         .hidden {
@@ -486,581 +702,825 @@
             .notification.show {
                 transform: translateY(0);
             }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .expense-actions {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .btn-edit, .btn-danger {
+                width: 100%;
+                margin-right: 0;
+            }
+
+            .category-select {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+                width: 95%;
+            }
         }
-</style>
+    </style>
 </head>
 <body>
+    <!-- Toggle de Tema -->
+    <div class="theme-toggle" id="themeToggle">
+        🌙
+    </div>
+
     <!-- Tela de Login -->
     <div id="loginScreen" class="login-container">
         <div class="login-card">
             <h1 class="login-title">💳 Controle de Gastos</h1>
             <p class="login-subtitle">Entre com seu usuário e senha</p>
-
-```
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Usuário</label>
-                <input type="text" id="username" class="form-control" placeholder="Digite seu usuário" required>
-            </div>
             
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" class="form-control" placeholder="Digite sua senha" required>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Entrar</button>
-            <button type="button" id="registerBtn" class="btn btn-secondary">Criar Nova Conta</button>
-        </form>
-    </div>
-</div>
-
-<!-- Tela Principal (App) -->
-<div id="appScreen" class="container hidden">
-    <div class="user-info">
-        <span>👤 Logado como: <strong id="currentUser"></strong></span>
-        <button id="logoutBtn" class="logout-btn">Sair</button>
-    </div>
-
-    <div class="header">
-        <div class="header-content">
-            <h1>💳 Controle de Gastos</h1>
-        </div>
-        
-        <div class="cards-breakdown">
-            <div class="card-total">
-                <div class="card-name">Nubank</div>
-                <div class="card-amount" id="nubankTotal">R$ 0,00</div>
-                <div class="card-limit" id="nubankLimitText">Limite: R$ 0,00</div>
-                <div class="progress-bar-small">
-                    <div class="progress" id="nubankProgress"></div>
-                </div>
-            </div>
-            <div class="card-total">
-                <div class="card-name">Itaú</div>
-                <div class="card-amount" id="itauTotal">R$ 0,00</div>
-                <div class="card-limit" id="itauLimitText">Limite: R$ 0,00</div>
-                <div class="progress-bar-small">
-                    <div class="progress" id="itauProgress"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="alerts-container" id="alertContainer"></div>
-
-    <div class="main-content">
-        <div class="sidebar">
-            <div class="card limits-card">
-                <h3>Definir Limites</h3>
+            <form id="loginForm">
                 <div class="form-group">
-                    <label for="nubankLimitInput">Limite Nubank (R$)</label>
-                    <input type="number" id="nubankLimitInput" class="form-control" placeholder="Ex: 1500" step="0.01">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" class="form-control" placeholder="Digite seu usuário" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" class="form-control" placeholder="Digite sua senha" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Entrar</button>
+                <button type="button" id="registerBtn" class="btn btn-secondary">Criar Nova Conta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ Editar Gasto</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="editDescription">Descrição</label>
+                    <input type="text" id="editDescription" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="itauLimitInput">Limite Itaú (R$)</label>
-                    <input type="number" id="itauLimitInput" class="form-control" placeholder="Ex: 1500" step="0.01">
+                    <label for="editAmount">Valor (R$)</label>
+                    <input type="number" id="editAmount" class="form-control" step="0.01" required>
                 </div>
-                <button class="btn btn-secondary" id="setLimitsBtn">Definir Limites</button>
-            </div>
+                <div class="form-group">
+                    <label for="editCard">Cartão</label>
+                    <select id="editCard" class="form-control">
+                        <option value="Nubank">Nubank</option>
+                        <option value="Itaú">Itaú</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <div class="category-select" id="editCategorySelect">
+                        <button type="button" class="category-btn" data-category="🍔 Alimentação">🍔 Alimentação</button>
+                        <button type="button" class="category-btn" data-category="🚗 Transporte">🚗 Transporte</button>
+                        <button type="button" class="category-btn" data-category="🎉 Lazer">🎉 Lazer</button>
+                        <button type="button" class="category-btn" data-category="🛒 Compras">🛒 Compras</button>
+                        <button type="button" class="category-btn" data-category="🏥 Saúde">🏥 Saúde</button>
+                        <button type="button" class="category-btn" data-category="📚 Educação">📚 Educação</button>
+                        <button type="button" class="category-btn" data-category="🏠 Casa">🏠 Casa</button>
+                        <button type="button" class="category-btn" data-category="💼 Trabalho">💼 Trabalho</button>
+                        <button type="button" class="category-btn" data-category="🎁 Presentes">🎁 Presentes</button>
+                        <button type="button" class="category-btn active" data-category="❓ Outros">❓ Outros</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Salvar Alterações</button>
+                    <button type="button" class="btn btn-secondary" id="cancelEdit" style="flex: 1;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <div class="card expense-form-card">
-                <h3>Registrar Gasto</h3>
-                <form id="expenseForm">
-                    <div class="form-group">
-                        <label for="descriptionInput">Descrição</label>
-                        <input type="text" id="descriptionInput" class="form-control" placeholder="Ex: Supermercado, Uber..." required>
+    <!-- Tela Principal (App) -->
+    <div id="appScreen" class="container hidden">
+        <div class="user-info">
+            <span>👤 Logado como: <strong id="currentUser"></strong></span>
+            <button id="logoutBtn" class="logout-btn">Sair</button>
+        </div>
+
+        <div class="header">
+            <div class="header-content">
+                <h1>💳 Controle de Gastos</h1>
+            </div>
+            
+            <div class="cards-breakdown">
+                <div class="card-total">
+                    <div class="card-name">Nubank</div>
+                    <div class="card-amount" id="nubankTotal">R$ 0,00</div>
+                    <div class="card-limit" id="nubankLimitText">Limite: R$ 0,00</div>
+                    <div class="progress-bar-small">
+                        <div class="progress" id="nubankProgress"></div>
                     </div>
-                    <div class="form-group">
-                        <label for="amountInput">Valor (R$)</label>
-                        <input type="number" id="amountInput" class="form-control" placeholder="0,00" step="0.01" required>
+                </div>
+                <div class="card-total">
+                    <div class="card-name">Itaú</div>
+                    <div class="card-amount" id="itauTotal">R$ 0,00</div>
+                    <div class="card-limit" id="itauLimitText">Limite: R$ 0,00</div>
+                    <div class="progress-bar-small">
+                        <div class="progress" id="itauProgress"></div>
                     </div>
-                    <div class="form-group">
-                        <label for="cardSelect">Cartão</label>
-                        <select id="cardSelect" class="form-control">
-                            <option value="Nubank">Nubank</option>
-                            <option value="Itaú">Itaú</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Registrar Gasto</button>
-                </form>
+                </div>
             </div>
         </div>
 
-        <div class="main-area">
-            <div class="card expense-list-card">
-                <h3>Gastos Recentes</h3>
-                <div class="filter-tabs">
-                    <button class="filter-tab active" data-filter="todos">Todos</button>
-                    <button class="filter-tab" data-filter="Nubank">Nubank</button>
-                    <button class="filter-tab" data-filter="Itaú">Itaú</button>
+        <div class="alerts-container" id="alertContainer"></div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="card limits-card">
+                    <h3>Definir Limites</h3>
+                    <div class="form-group">
+                        <label for="nubankLimitInput">Limite Nubank (R$)</label>
+                        <input type="number" id="nubankLimitInput" class="form-control" placeholder="Ex: 1500" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="itauLimitInput">Limite Itaú (R$)</label>
+                        <input type="number" id="itauLimitInput" class="form-control" placeholder="Ex: 1500" step="0.01">
+                    </div>
+                    <button class="btn btn-secondary" id="setLimitsBtn">Definir Limites</button>
                 </div>
-                <div class="expense-list" id="expenseList"></div>
-                <button class="btn btn-secondary" id="clearExpensesBtn">Limpar Todos os Gastos</button>
+
+                <div class="card expense-form-card">
+                    <h3>Registrar Gasto</h3>
+                    <form id="expenseForm">
+                        <div class="form-group">
+                            <label for="descriptionInput">Descrição</label>
+                            <input type="text" id="descriptionInput" class="form-control" placeholder="Ex: Supermercado, Uber..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="amountInput">Valor (R$)</label>
+                            <input type="number" id="amountInput" class="form-control" placeholder="0,00" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cardSelect">Cartão</label>
+                            <select id="cardSelect" class="form-control">
+                                <option value="Nubank">Nubank</option>
+                                <option value="Itaú">Itaú</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <div class="category-select" id="categorySelect">
+                                <button type="button" class="category-btn" data-category="🍔 Alimentação">🍔 Alimentação</button>
+                                <button type="button" class="category-btn" data-category="🚗 Transporte">🚗 Transporte</button>
+                                <button type="button" class="category-btn" data-category="🎉 Lazer">🎉 Lazer</button>
+                                <button type="button" class="category-btn" data-category="🛒 Compras">🛒 Compras</button>
+                                <button type="button" class="category-btn" data-category="🏥 Saúde">🏥 Saúde</button>
+                                <button type="button" class="category-btn" data-category="📚 Educação">📚 Educação</button>
+                                <button type="button" class="category-btn" data-category="🏠 Casa">🏠 Casa</button>
+                                <button type="button" class="category-btn" data-category="💼 Trabalho">💼 Trabalho</button>
+                                <button type="button" class="category-btn" data-category="🎁 Presentes">🎁 Presentes</button>
+                                <button type="button" class="category-btn active" data-category="❓ Outros">❓ Outros</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrar Gasto</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="main-area">
+                <div class="card expense-list-card">
+                    <h3>Gastos Recentes</h3>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="todos">Todos</button>
+                        <button class="filter-tab" data-filter="Nubank">Nubank</button>
+                        <button class="filter-tab" data-filter="Itaú">Itaú</button>
+                    </div>
+                    <div class="expense-list" id="expenseList"></div>
+                    <button class="btn btn-secondary" id="clearExpensesBtn">Limpar Todos os Gastos</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    const App = {
-        currentUser: null,
-        
-        init() {
-            this.bindLoginEvents();
-            this.checkAutoLogin();
-        },
+    <script>
+        const ThemeManager = {
+            init() {
+                this.loadTheme();
+                this.bindEvents();
+            },
 
-        bindLoginEvents() {
-            document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
-            document.getElementById('registerBtn').addEventListener('click', (e) => this.handleRegister(e));
-            document.getElementById('logoutBtn').addEventListener('click', (e) => this.handleLogout(e));
-        },
+            loadTheme() {
+                const theme = localStorage.getItem('theme') || 'light';
+                this.setTheme(theme);
+            },
 
-        checkAutoLogin() {
-            // Verificar se há usuário logado salvo no localStorage
-            const user = localStorage.getItem('currentUser');
-            if (user) {
-                this.currentUser = user;
-                this.showApp();
+            setTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                
+                const toggle = document.getElementById('themeToggle');
+                toggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+            },
+
+            toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme') || 'light';
+                const newTheme = current === 'dark' ? 'light' : 'dark';
+                this.setTheme(newTheme);
+            },
+
+            bindEvents() {
+                document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
             }
-        },
+        };
 
-        handleLogin(e) {
-            e.preventDefault();
+        const App = {
+            currentUser: null,
             
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
+            init() {
+                ThemeManager.init();
+                this.bindLoginEvents();
+                this.checkAutoLogin();
+            },
 
-            if (!username || !password) {
-                this.showNotification('Preencha usuário e senha!', 'error');
-                return;
-            }
+            bindLoginEvents() {
+                document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
+                document.getElementById('registerBtn').addEventListener('click', (e) => this.handleRegister(e));
+                document.getElementById('logoutBtn').addEventListener('click', (e) => this.handleLogout(e));
+            },
 
-            // Sistema simples de validação
-            const users = this.getUsers();
-            
-            if (users[username] && users[username] === password) {
+            checkAutoLogin() {
+                const user = localStorage.getItem('currentUser');
+                if (user) {
+                    this.currentUser = user;
+                    this.showApp();
+                }
+            },
+
+            handleLogin(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+
+                if (!username || !password) {
+                    this.showNotification('Preencha usuário e senha!', 'error');
+                    return;
+                }
+
+                const users = this.getUsers();
+                
+                if (users[username] && users[username] === password) {
+                    this.currentUser = username;
+                    localStorage.setItem('currentUser', username);
+                    this.showApp();
+                    this.showNotification(`Bem-vindo, ${username}! 🎉`, 'success');
+                } else {
+                    this.showNotification('Usuário ou senha incorretos!', 'error');
+                }
+            },
+
+            handleRegister(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+
+                if (!username || !password) {
+                    this.showNotification('Preencha usuário e senha!', 'error');
+                    return;
+                }
+
+                if (username.length < 3) {
+                    this.showNotification('Usuário deve ter pelo menos 3 caracteres!', 'error');
+                    return;
+                }
+
+                if (password.length < 4) {
+                    this.showNotification('Senha deve ter pelo menos 4 caracteres!', 'error');
+                    return;
+                }
+
+                const users = this.getUsers();
+                
+                if (users[username]) {
+                    this.showNotification('Usuário já existe! Tente outro nome.', 'error');
+                    return;
+                }
+
+                users[username] = password;
+                this.saveUsers(users);
+                
                 this.currentUser = username;
                 localStorage.setItem('currentUser', username);
                 this.showApp();
-                this.showNotification(`Bem-vindo, ${username}! 🎉`, 'success');
-            } else {
-                this.showNotification('Usuário ou senha incorretos!', 'error');
-            }
-        },
+                this.showNotification(`Conta criada com sucesso! Bem-vindo, ${username}! 🎉`, 'success');
+            },
 
-        handleRegister(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
+            handleLogout(e) {
+                e.preventDefault();
+                
+                if (confirm('Tem certeza que deseja sair?')) {
+                    this.currentUser = null;
+                    localStorage.removeItem('currentUser');
+                    this.showLogin();
+                    this.showNotification('Logout realizado com sucesso! 👋', 'success');
+                }
+            },
 
-            if (!username || !password) {
-                this.showNotification('Preencha usuário e senha!', 'error');
-                return;
-            }
+            showLogin() {
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('appScreen').classList.add('hidden');
+                document.getElementById('loginForm').reset();
+            },
 
-            if (username.length < 3) {
-                this.showNotification('Usuário deve ter pelo menos 3 caracteres!', 'error');
-                return;
-            }
+            showApp() {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appScreen').classList.remove('hidden');
+                document.getElementById('currentUser').textContent = this.currentUser;
+                
+                ExpenseTracker.init();
+            },
 
-            if (password.length < 4) {
-                this.showNotification('Senha deve ter pelo menos 4 caracteres!', 'error');
-                return;
-            }
+            getUsers() {
+                const users = localStorage.getItem('appUsers');
+                return users ? JSON.parse(users) : {};
+            },
 
-            const users = this.getUsers();
-            
-            if (users[username]) {
-                this.showNotification('Usuário já existe! Tente outro nome.', 'error');
-                return;
-            }
+            saveUsers(users) {
+                localStorage.setItem('appUsers', JSON.stringify(users));
+            },
 
-            // Criar novo usuário
-            users[username] = password;
-            this.saveUsers(users);
-            
-            this.currentUser = username;
-            localStorage.setItem('currentUser', username);
-            this.showApp();
-            this.showNotification(`Conta criada com sucesso! Bem-vindo, ${username}! 🎉`, 'success');
-        },
+            showNotification(message, type = 'success') {
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
 
-        handleLogout(e) {
-            e.preventDefault();
-            
-            if (confirm('Tem certeza que deseja sair?')) {
-                this.currentUser = null;
-                localStorage.removeItem('currentUser');
-                this.showLogin();
-                this.showNotification('Logout realizado com sucesso! 👋', 'success');
-            }
-        },
+                const notification = document.createElement('div');
+                notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+                notification.textContent = message;
 
-        showLogin() {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('appScreen').classList.add('hidden');
-            document.getElementById('loginForm').reset();
-        },
+                document.body.appendChild(notification);
 
-        showApp() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('appScreen').classList.remove('hidden');
-            document.getElementById('currentUser').textContent = this.currentUser;
-            
-            // Inicializar o controle de gastos
-            ExpenseTracker.init();
-        },
+                requestAnimationFrame(() => {
+                    notification.classList.add('show');
+                });
 
-        getUsers() {
-            // Salvar usuários no localStorage
-            const users = localStorage.getItem('appUsers');
-            return users ? JSON.parse(users) : {};
-        },
-
-        saveUsers(users) {
-            localStorage.setItem('appUsers', JSON.stringify(users));
-        },
-
-        showNotification(message, type = 'success') {
-            const existingNotification = document.querySelector('.notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
-
-            const notification = document.createElement('div');
-            notification.className = `notification ${type === 'error' ? 'error' : ''}`;
-            notification.textContent = message;
-
-            document.body.appendChild(notification);
-
-            requestAnimationFrame(() => {
-                notification.classList.add('show');
-            });
-
-            setTimeout(() => {
-                notification.classList.remove('show');
                 setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 4000);
+            }
+        };
+
+        const ExpenseTracker = {
+            state: {
+                expenses: [],
+                limits: { Nubank: 0, Itaú: 0 },
+                currentFilter: 'todos',
+                selectedCategory: '❓ Outros',
+                editingExpense: null
+            },
+            elements: {},
+
+            init() {
+                this.loadUserData();
+                this.cacheElements();
+                this.bindEvents();
+                this.render();
+                console.log('🚀 Controle de Gastos inicializado para:', App.currentUser);
+            },
+
+            loadUserData() {
+                const userKey = `userData_${App.currentUser}`;
+                const userData = localStorage.getItem(userKey);
+                
+                if (userData) {
+                    this.state = { ...this.state, ...JSON.parse(userData) };
+                }
+            },
+
+            saveUserData() {
+                const userKey = `userData_${App.currentUser}`;
+                localStorage.setItem(userKey, JSON.stringify(this.state));
+            },
+
+            cacheElements() {
+                this.elements = {
+                    nubank: {
+                        total: document.getElementById('nubankTotal'),
+                        limitText: document.getElementById('nubankLimitText'),
+                        progress: document.getElementById('nubankProgress'),
+                        limitInput: document.getElementById('nubankLimitInput'),
+                    },
+                    itau: {
+                        total: document.getElementById('itauTotal'),
+                        limitText: document.getElementById('itauLimitText'),
+                        progress: document.getElementById('itauProgress'),
+                        limitInput: document.getElementById('itauLimitInput'),
+                    },
+                    setLimitsBtn: document.getElementById('setLimitsBtn'),
+                    expenseForm: document.getElementById('expenseForm'),
+                    descriptionInput: document.getElementById('descriptionInput'),
+                    amountInput: document.getElementById('amountInput'),
+                    cardSelect: document.getElementById('cardSelect'),
+                    categorySelect: document.getElementById('categorySelect'),
+                    expenseList: document.getElementById('expenseList'),
+                    clearExpensesBtn: document.getElementById('clearExpensesBtn'),
+                    alertContainer: document.getElementById('alertContainer'),
+                    filterTabs: document.querySelector('.filter-tabs'),
+                    editModal: document.getElementById('editModal'),
+                    editForm: document.getElementById('editForm'),
+                    closeModal: document.getElementById('closeModal'),
+                    cancelEdit: document.getElementById('cancelEdit'),
+                    editDescription: document.getElementById('editDescription'),
+                    editAmount: document.getElementById('editAmount'),
+                    editCard: document.getElementById('editCard'),
+                    editCategorySelect: document.getElementById('editCategorySelect'),
+                };
+            },
+
+            bindEvents() {
+                this.elements.setLimitsBtn.addEventListener('click', (e) => this.handleSetLimits(e));
+                this.elements.expenseForm.addEventListener('submit', (e) => this.handleAddExpense(e));
+                this.elements.clearExpensesBtn.addEventListener('click', (e) => this.handleClearExpenses(e));
+                this.elements.filterTabs.addEventListener('click', (e) => this.handleFilter(e));
+                this.elements.categorySelect.addEventListener('click', (e) => this.handleCategorySelect(e));
+                this.elements.editCategorySelect.addEventListener('click', (e) => this.handleEditCategorySelect(e));
+                this.elements.closeModal.addEventListener('click', () => this.closeEditModal());
+                this.elements.cancelEdit.addEventListener('click', () => this.closeEditModal());
+                this.elements.editForm.addEventListener('submit', (e) => this.handleEditExpense(e));
+                
+                // Close modal quando clica fora
+                this.elements.editModal.addEventListener('click', (e) => {
+                    if (e.target === this.elements.editModal) {
+                        this.closeEditModal();
                     }
-                }, 300);
-            }, 4000);
-        }
-    };
+                });
+            },
 
-    const ExpenseTracker = {
-        state: {
-            expenses: [],
-            limits: { Nubank: 0, Itaú: 0 },
-            currentFilter: 'todos',
-        },
-        elements: {},
+            handleCategorySelect(e) {
+                if (e.target.classList.contains('category-btn')) {
+                    // Remove active de todos
+                    this.elements.categorySelect.querySelectorAll('.category-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Adiciona active no clicado
+                    e.target.classList.add('active');
+                    this.state.selectedCategory = e.target.dataset.category;
+                }
+            },
 
-        init() {
-            this.loadUserData();
-            this.cacheElements();
-            this.bindEvents();
-            this.render();
-            console.log('🚀 Controle de Gastos inicializado para:', App.currentUser);
-        },
+            handleEditCategorySelect(e) {
+                if (e.target.classList.contains('category-btn')) {
+                    this.elements.editCategorySelect.querySelectorAll('.category-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    e.target.classList.add('active');
+                }
+            },
 
-        loadUserData() {
-            // Carregar dados específicos do usuário do localStorage
-            const userKey = `userData_${App.currentUser}`;
-            const userData = localStorage.getItem(userKey);
-            
-            if (userData) {
-                this.state = { ...this.state, ...JSON.parse(userData) };
-            }
-        },
+            openEditModal(expenseId) {
+                const expense = this.state.expenses.find(exp => exp.id === expenseId);
+                if (!expense) return;
 
-        saveUserData() {
-            // Salvar dados específicos do usuário no localStorage
-            const userKey = `userData_${App.currentUser}`;
-            localStorage.setItem(userKey, JSON.stringify(this.state));
-        },
+                this.state.editingExpense = expenseId;
+                
+                this.elements.editDescription.value = expense.description;
+                this.elements.editAmount.value = expense.amount;
+                this.elements.editCard.value = expense.card;
+                
+                // Selecionar categoria
+                this.elements.editCategorySelect.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.category === expense.category) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                this.elements.editModal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            },
 
-        _getAllUserData() {
-            // Não precisamos mais destes métodos com localStorage
-            return {};
-        },
+            closeEditModal() {
+                this.elements.editModal.classList.remove('show');
+                this.state.editingExpense = null;
+                document.body.style.overflow = '';
+            },
 
-        _setAllUserData(data) {
-            // Não precisamos mais destes métodos com localStorage
-        },
+            handleEditExpense(e) {
+                e.preventDefault();
+                
+                if (!this.state.editingExpense) return;
+                
+                const description = this.elements.editDescription.value.trim();
+                const amount = parseFloat(this.elements.editAmount.value);
+                const card = this.elements.editCard.value;
+                const categoryBtn = this.elements.editCategorySelect.querySelector('.category-btn.active');
+                const category = categoryBtn ? categoryBtn.dataset.category : '❓ Outros';
 
-        cacheElements() {
-            this.elements = {
-                nubank: {
-                    total: document.getElementById('nubankTotal'),
-                    limitText: document.getElementById('nubankLimitText'),
-                    progress: document.getElementById('nubankProgress'),
-                    limitInput: document.getElementById('nubankLimitInput'),
-                },
-                itau: {
-                    total: document.getElementById('itauTotal'),
-                    limitText: document.getElementById('itauLimitText'),
-                    progress: document.getElementById('itauProgress'),
-                    limitInput: document.getElementById('itauLimitInput'),
-                },
-                setLimitsBtn: document.getElementById('setLimitsBtn'),
-                expenseForm: document.getElementById('expenseForm'),
-                descriptionInput: document.getElementById('descriptionInput'),
-                amountInput: document.getElementById('amountInput'),
-                cardSelect: document.getElementById('cardSelect'),
-                expenseList: document.getElementById('expenseList'),
-                clearExpensesBtn: document.getElementById('clearExpensesBtn'),
-                alertContainer: document.getElementById('alertContainer'),
-                filterTabs: document.querySelector('.filter-tabs'),
-            };
-        },
-
-        bindEvents() {
-            this.elements.setLimitsBtn.addEventListener('click', (e) => this.handleSetLimits(e));
-            this.elements.expenseForm.addEventListener('submit', (e) => this.handleAddExpense(e));
-            this.elements.clearExpensesBtn.addEventListener('click', (e) => this.handleClearExpenses(e));
-            this.elements.filterTabs.addEventListener('click', (e) => this.handleFilter(e));
-        },
-
-        handleSetLimits(e) {
-            e.preventDefault();
-            
-            const nubank = parseFloat(this.elements.nubank.limitInput.value) || 0;
-            const itau = parseFloat(this.elements.itau.limitInput.value) || 0;
-
-            if (nubank === 0 && itau === 0) {
-                App.showNotification('Por favor, defina pelo menos um limite.', 'error');
-                return;
-            }
-
-            this.state.limits = { 
-                Nubank: nubank || this.state.limits.Nubank, 
-                Itaú: itau || this.state.limits.Itaú 
-            };
-
-            this.saveUserData();
-            App.showNotification('Limites definidos com sucesso! 🎯', 'success');
-            this.render();
-        },
-
-        handleAddExpense(event) {
-            event.preventDefault();
-            
-            const description = this.elements.descriptionInput.value.trim();
-            const amount = parseFloat(this.elements.amountInput.value);
-            const card = this.elements.cardSelect.value;
-
-            if (!description) {
-                App.showNotification('Por favor, insira uma descrição.', 'error');
-                return;
-            }
-
-            if (!amount || amount <= 0) {
-                App.showNotification('Por favor, insira um valor válido.', 'error');
-                return;
-            }
-
-            if (amount > 10000) {
-                if (!confirm('Valor muito alto! Tem certeza que deseja registrar este gasto?')) {
+                if (!description || !amount || amount <= 0) {
+                    App.showNotification('Preencha todos os campos corretamente!', 'error');
                     return;
                 }
-            }
 
-            const newExpense = {
-                id: Date.now(),
-                description,
-                amount,
-                card,
-                date: new Date().toLocaleDateString('pt-BR'),
-                timestamp: new Date()
-            };
+                const expenseIndex = this.state.expenses.findIndex(exp => exp.id === this.state.editingExpense);
+                if (expenseIndex !== -1) {
+                    this.state.expenses[expenseIndex] = {
+                        ...this.state.expenses[expenseIndex],
+                        description,
+                        amount,
+                        card,
+                        category
+                    };
+                    
+                    this.saveUserData();
+                    this.closeEditModal();
+                    this.render();
+                    App.showNotification('Gasto atualizado com sucesso! ✏️', 'success');
+                }
+            },
 
-            this.state.expenses.unshift(newExpense);
-            this.elements.expenseForm.reset();
-            this.saveUserData();
-            App.showNotification(`Gasto de ${this.utils.formatCurrency(amount)} registrado! 💸`, 'success');
-            this.render();
-        },
+            handleDeleteExpense(expenseId) {
+                const expense = this.state.expenses.find(exp => exp.id === expenseId);
+                if (!expense) return;
+                
+                if (confirm(`⚠️ Tem certeza que deseja excluir o gasto "${expense.description}"?`)) {
+                    this.state.expenses = this.state.expenses.filter(exp => exp.id !== expenseId);
+                    this.saveUserData();
+                    this.render();
+                    App.showNotification('Gasto excluído com sucesso! 🗑️', 'success');
+                }
+            },
 
-        handleClearExpenses() {
-            if (this.state.expenses.length === 0) {
-                App.showNotification('Não há gastos para remover.', 'error');
-                return;
-            }
+            handleSetLimits(e) {
+                e.preventDefault();
+                
+                const nubank = parseFloat(this.elements.nubank.limitInput.value) || 0;
+                const itau = parseFloat(this.elements.itau.limitInput.value) || 0;
 
-            if (confirm('⚠️ Tem certeza que deseja apagar todos os gastos? Esta ação não pode ser desfeita.')) {
-                this.state.expenses = [];
+                if (nubank === 0 && itau === 0) {
+                    App.showNotification('Por favor, defina pelo menos um limite.', 'error');
+                    return;
+                }
+
+                this.state.limits = { 
+                    Nubank: nubank || this.state.limits.Nubank, 
+                    Itaú: itau || this.state.limits.Itaú 
+                };
+
                 this.saveUserData();
-                App.showNotification('Todos os gastos foram removidos. 🗑️', 'success');
+                App.showNotification('Limites definidos com sucesso! 🎯', 'success');
                 this.render();
-            }
-        },
+            },
 
-        handleFilter(event) {
-            if (event.target.classList.contains('filter-tab')) {
-                this.state.currentFilter = event.target.dataset.filter;
-                this.render();
-            }
-        },
+            handleAddExpense(event) {
+                event.preventDefault();
+                
+                const description = this.elements.descriptionInput.value.trim();
+                const amount = parseFloat(this.elements.amountInput.value);
+                const card = this.elements.cardSelect.value;
 
-        render() {
-            this.updateTotals();
-            this.updateProgressBars();
-            this.renderExpenseList();
-            this.renderAlerts();
-            this.updateFormInputs();
-            this.updateFilterTabs();
-        },
+                if (!description) {
+                    App.showNotification('Por favor, insira uma descrição.', 'error');
+                    return;
+                }
 
-        updateTotals() {
-            const totals = this.calculateTotals();
-            const { formatCurrency } = this.utils;
-            
-            this.elements.nubank.total.textContent = formatCurrency(totals.Nubank);
-            this.elements.itau.total.textContent = formatCurrency(totals.Itaú);
-            
-            this.elements.nubank.limitText.textContent = `Limite: ${formatCurrency(this.state.limits.Nubank)}`;
-            this.elements.itau.limitText.textContent = `Limite: ${formatCurrency(this.state.limits.Itaú)}`;
-        },
+                if (!amount || amount <= 0) {
+                    App.showNotification('Por favor, insira um valor válido.', 'error');
+                    return;
+                }
 
-        updateProgressBars() {
-            const totals = this.calculateTotals();
-            const { calculatePercentage } = this.utils;
-
-            this.elements.nubank.progress.style.width = calculatePercentage(totals.Nubank, this.state.limits.Nubank);
-            this.elements.itau.progress.style.width = calculatePercentage(totals.Itaú, this.state.limits.Itaú);
-        },
-
-        renderExpenseList() {
-            const filtered = this.getFilteredExpenses();
-            
-            if (filtered.length === 0) {
-                const message = this.state.currentFilter === 'todos' 
-                    ? '🤷‍♂️ Nenhum gasto registrado ainda.<br><small>Comece adicionando seus gastos!</small>'
-                    : `📭 Nenhum gasto no ${this.state.currentFilter}.<br><small>Tente outro filtro!</small>`;
-                    
-                this.elements.expenseList.innerHTML = `<div class="no-expenses">${message}</div>`;
-                return;
-            }
-
-            this.elements.expenseList.innerHTML = filtered.map((expense, index) => `
-                <div class="expense-item" style="animation: slideIn 0.3s ease ${index * 0.1}s both">
-                    <div class="expense-info">
-                        <div class="expense-description">${this.utils.escapeHtml(expense.description)}</div>
-                        <span class="expense-card-badge ${expense.card}">${expense.card}</span>
-                    </div>
-                    <div class="expense-amount">${this.utils.formatCurrency(expense.amount)}</div>
-                </div>
-            `).join('');
-        },
-
-        renderAlerts() {
-            const totals = this.calculateTotals();
-            const alerts = this.generateAlerts(totals);
-
-            this.elements.alertContainer.innerHTML = alerts.map(alert => `
-                <div class="alert alert-${alert.type}">${alert.message}</div>
-            `).join('');
-        },
-
-        updateFormInputs() {
-            const { limits } = this.state;
-            
-            if (!this.elements.nubank.limitInput.value && limits.Nubank > 0) {
-                this.elements.nubank.limitInput.value = limits.Nubank;
-            }
-            if (!this.elements.itau.limitInput.value && limits.Itaú > 0) {
-                this.elements.itau.limitInput.value = limits.Itaú;
-            }
-        },
-
-        updateFilterTabs() {
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.filter === this.state.currentFilter);
-            });
-        },
-
-        calculateTotals() {
-            return {
-                Nubank: this.state.expenses.filter(e => e.card === 'Nubank').reduce((sum, exp) => sum + exp.amount, 0),
-                Itaú: this.state.expenses.filter(e => e.card === 'Itaú').reduce((sum, exp) => sum + exp.amount, 0),
-            };
-        },
-
-        getFilteredExpenses() {
-            return this.state.expenses.filter(expense => 
-                this.state.currentFilter === 'todos' || expense.card === this.state.currentFilter
-            );
-        },
-
-        generateAlerts(totals) {
-            const alerts = [];
-            const { limits } = this.state;
-
-            ['Nubank', 'Itaú'].forEach(card => {
-                if (limits[card] > 0) {
-                    const percentage = (totals[card] / limits[card]) * 100;
-                    
-                    if (percentage >= 100) {
-                        alerts.push({
-                            type: 'danger',
-                            message: `🚨 ${card.toUpperCase()}: Limite estourado! Pare de usar este cartão!`
-                        });
-                    } else if (percentage >= 90) {
-                        alerts.push({
-                            type: 'warning',
-                            message: `🔥 ${card.toUpperCase()}: Quase estourando! ${Math.round(percentage)}% usado.`
-                        });
-                    } else if (percentage >= 80) {
-                        alerts.push({
-                            type: 'warning',
-                            message: `⚠️ ${card.toUpperCase()}: Você usou ${Math.round(percentage)}% do limite.`
-                        });
+                if (amount > 10000) {
+                    if (!confirm('Valor muito alto! Tem certeza que deseja registrar este gasto?')) {
+                        return;
                     }
                 }
-            });
 
-            return alerts;
-        },
+                const newExpense = {
+                    id: Date.now(),
+                    description,
+                    amount,
+                    card,
+                    category: this.state.selectedCategory,
+                    date: new Date().toLocaleDateString('pt-BR'),
+                    timestamp: new Date()
+                };
 
-        utils: {
-            formatCurrency(value) {
-                return new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                }).format(value);
+                this.state.expenses.unshift(newExpense);
+                this.elements.expenseForm.reset();
+                
+                // Reset categoria para "Outros"
+                this.elements.categorySelect.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.category === '❓ Outros') {
+                        btn.classList.add('active');
+                    }
+                });
+                this.state.selectedCategory = '❓ Outros';
+                
+                this.saveUserData();
+                App.showNotification(`Gasto de ${this.utils.formatCurrency(amount)} registrado! 💸`, 'success');
+                this.render();
             },
 
-            calculatePercentage(value, limit) {
-                if (limit <= 0) return '0%';
-                return `${Math.min((value / limit) * 100, 100)}%`;
+            handleClearExpenses() {
+                if (this.state.expenses.length === 0) {
+                    App.showNotification('Não há gastos para remover.', 'error');
+                    return;
+                }
+
+                if (confirm('⚠️ Tem certeza que deseja apagar todos os gastos? Esta ação não pode ser desfeita.')) {
+                    this.state.expenses = [];
+                    this.saveUserData();
+                    App.showNotification('Todos os gastos foram removidos. 🗑️', 'success');
+                    this.render();
+                }
             },
 
-            escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
+            handleFilter(event) {
+                if (event.target.classList.contains('filter-tab')) {
+                    this.state.currentFilter = event.target.dataset.filter;
+                    this.render();
+                }
+            },
+
+            render() {
+                this.updateTotals();
+                this.updateProgressBars();
+                this.renderExpenseList();
+                this.renderAlerts();
+                this.updateFormInputs();
+                this.updateFilterTabs();
+            },
+
+            updateTotals() {
+                const totals = this.calculateTotals();
+                const { formatCurrency } = this.utils;
+                
+                this.elements.nubank.total.textContent = formatCurrency(totals.Nubank);
+                this.elements.itau.total.textContent = formatCurrency(totals.Itaú);
+                
+                this.elements.nubank.limitText.textContent = `Limite: ${formatCurrency(this.state.limits.Nubank)}`;
+                this.elements.itau.limitText.textContent = `Limite: ${formatCurrency(this.state.limits.Itaú)}`;
+            },
+
+            updateProgressBars() {
+                const totals = this.calculateTotals();
+                const { calculatePercentage } = this.utils;
+
+                this.elements.nubank.progress.style.width = calculatePercentage(totals.Nubank, this.state.limits.Nubank);
+                this.elements.itau.progress.style.width = calculatePercentage(totals.Itaú, this.state.limits.Itaú);
+            },
+
+            renderExpenseList() {
+                const filtered = this.getFilteredExpenses();
+                
+                if (filtered.length === 0) {
+                    const message = this.state.currentFilter === 'todos' 
+                        ? '🤷‍♂️ Nenhum gasto registrado ainda.<br><small>Comece adicionando seus gastos!</small>'
+                        : `📭 Nenhum gasto no ${this.state.currentFilter}.<br><small>Tente outro filtro!</small>`;
+                        
+                    this.elements.expenseList.innerHTML = `<div class="no-expenses">${message}</div>`;
+                    return;
+                }
+
+                this.elements.expenseList.innerHTML = filtered.map((expense, index) => `
+                    <div class="expense-item" style="animation: slideIn 0.3s ease ${index * 0.1}s both">
+                        <div class="expense-header">
+                            <div class="expense-info">
+                                <div class="expense-description">${this.utils.escapeHtml(expense.description)}</div>
+                                <div class="expense-meta">
+                                    <span class="expense-card-badge ${expense.card}">${expense.card}</span>
+                                    <span class="expense-category-badge">${expense.category || '❓ Outros'}</span>
+                                    <span class="expense-date">${expense.date}</span>
+                                </div>
+                            </div>
+                            <div class="expense-amount">${this.utils.formatCurrency(expense.amount)}</div>
+                        </div>
+                        <div class="expense-actions">
+                            <button class="btn btn-edit" onclick="ExpenseTracker.openEditModal(${expense.id})">✏️ Editar</button>
+                            <button class="btn btn-danger" onclick="ExpenseTracker.handleDeleteExpense(${expense.id})">🗑️ Excluir</button>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            renderAlerts() {
+                const totals = this.calculateTotals();
+                const alerts = this.generateAlerts(totals);
+
+                this.elements.alertContainer.innerHTML = alerts.map(alert => `
+                    <div class="alert alert-${alert.type}">${alert.message}</div>
+                `).join('');
+            },
+
+            updateFormInputs() {
+                const { limits } = this.state;
+                
+                if (!this.elements.nubank.limitInput.value && limits.Nubank > 0) {
+                    this.elements.nubank.limitInput.value = limits.Nubank;
+                }
+                if (!this.elements.itau.limitInput.value && limits.Itaú > 0) {
+                    this.elements.itau.limitInput.value = limits.Itaú;
+                }
+            },
+
+            updateFilterTabs() {
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.filter === this.state.currentFilter);
+                });
+            },
+
+            calculateTotals() {
+                return {
+                    Nubank: this.state.expenses.filter(e => e.card === 'Nubank').reduce((sum, exp) => sum + exp.amount, 0),
+                    Itaú: this.state.expenses.filter(e => e.card === 'Itaú').reduce((sum, exp) => sum + exp.amount, 0),
+                };
+            },
+
+            getFilteredExpenses() {
+                return this.state.expenses.filter(expense => 
+                    this.state.currentFilter === 'todos' || expense.card === this.state.currentFilter
+                );
+            },
+
+            generateAlerts(totals) {
+                const alerts = [];
+                const { limits } = this.state;
+
+                ['Nubank', 'Itaú'].forEach(card => {
+                    if (limits[card] > 0) {
+                        const percentage = (totals[card] / limits[card]) * 100;
+                        
+                        if (percentage >= 100) {
+                            alerts.push({
+                                type: 'danger',
+                                message: `🚨 ${card.toUpperCase()}: Limite estourado! Pare de usar este cartão!`
+                            });
+                        } else if (percentage >= 90) {
+                            alerts.push({
+                                type: 'warning',
+                                message: `🔥 ${card.toUpperCase()}: Quase estourando! ${Math.round(percentage)}% usado.`
+                            });
+                        } else if (percentage >= 80) {
+                            alerts.push({
+                                type: 'warning',
+                                message: `⚠️ ${card.toUpperCase()}: Você usou ${Math.round(percentage)}% do limite.`
+                            });
+                        }
+                    }
+                });
+
+                return alerts;
+            },
+
+            utils: {
+                formatCurrency(value) {
+                    return new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    }).format(value);
+                },
+
+                calculatePercentage(value, limit) {
+                    if (limit <= 0) return '0%';
+                    return `${Math.min((value / limit) * 100, 100)}%`;
+                },
+
+                escapeHtml(text) {
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                }
             }
-        }
-    };
+        };
 
-    document.addEventListener('DOMContentLoaded', () => {
-        try {
-            App.init();
-        } catch (error) {
-            console.error('Erro ao inicializar o aplicativo:', error);
-            document.body.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #e53e3e;">
-                    <h2>⚠️ Erro ao carregar o aplicativo</h2>
-                    <p>Por favor, recarregue a página.</p>
-                </div>
-            `;
-        }
-    });
-</script>
-```
-
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                App.init();
+            } catch (error) {
+                console.error('Erro ao inicializar o aplicativo:', error);
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #e53e3e;">
+                        <h2>⚠️ Erro ao carregar o aplicativo</h2>
+                        <p>Por favor, recarregue a página.</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
 </body>
 </html>
