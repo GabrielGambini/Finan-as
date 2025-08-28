@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Gastos</title>
+    <title>Controle de Gastos - Login</title>
     <style>
         * {
             margin: 0;
@@ -57,32 +57,6 @@
         color: #718096;
         margin-bottom: 2rem;
         font-size: 1rem;
-    }
-
-    .storage-status {
-        background: #e6fffa;
-        border: 2px solid #38b2ac;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        text-align: left;
-    }
-
-    .storage-status.error {
-        background: #fed7d7;
-        border-color: #e53e3e;
-    }
-
-    .storage-status h4 {
-        color: #2d3748;
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
-    }
-
-    .storage-status p {
-        color: #4a5568;
-        font-size: 0.8rem;
-        margin-bottom: 0.25rem;
     }
 
     .form-group {
@@ -156,13 +130,6 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .data-info {
-        font-size: 0.8rem;
-        color: #4a5568;
     }
 
     .logout-btn {
@@ -468,26 +435,6 @@
         display: none !important;
     }
 
-    .backup-section {
-        margin-top: 1rem;
-        padding: 1rem;
-        background: #f8fafc;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-    }
-
-    .backup-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-    }
-
-    .btn-small {
-        padding: 0.5rem;
-        font-size: 0.8rem;
-    }
-
     @keyframes slideIn {
         from {
             opacity: 0;
@@ -540,15 +487,6 @@
         .notification.show {
             transform: translateY(0);
         }
-
-        .user-info {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .backup-buttons {
-            grid-template-columns: 1fr;
-        }
     }
 </style>
 ```
@@ -562,13 +500,6 @@
             <p class="login-subtitle">Entre com seu usuário e senha</p>
 
 ```
-        <!-- Status do Armazenamento -->
-        <div id="storageStatus" class="storage-status">
-            <h4>📊 Status do Armazenamento:</h4>
-            <p id="storageInfo">Verificando...</p>
-            <p id="storageUsage"></p>
-        </div>
-        
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">Usuário</label>
@@ -589,10 +520,7 @@
 <!-- Tela Principal (App) -->
 <div id="appScreen" class="container hidden">
     <div class="user-info">
-        <div>
-            <div>👤 Logado como: <strong id="currentUser"></strong></div>
-            <div class="data-info" id="dataInfo"></div>
-        </div>
+        <span>👤 Logado como: <strong id="currentUser"></strong></span>
         <button id="logoutBtn" class="logout-btn">Sair</button>
     </div>
 
@@ -636,17 +564,6 @@
                     <input type="number" id="itauLimitInput" class="form-control" placeholder="Ex: 1500" step="0.01">
                 </div>
                 <button class="btn btn-secondary" id="setLimitsBtn">Definir Limites</button>
-                
-                <!-- Seção de Backup -->
-                <div class="backup-section">
-                    <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">💾 Backup dos Dados:</h4>
-                    <p style="font-size: 0.8rem; color: #718096; margin-bottom: 0.5rem;">Seus dados são salvos automaticamente no navegador</p>
-                    <div class="backup-buttons">
-                        <button class="btn btn-secondary btn-small" id="exportBtn">📥 Exportar</button>
-                        <button class="btn btn-secondary btn-small" id="importBtn">📤 Importar</button>
-                    </div>
-                    <input type="file" id="importFile" accept=".json" style="display: none;">
-                </div>
             </div>
 
             <div class="card expense-form-card">
@@ -688,176 +605,465 @@
 </div>
 
 <script>
-    // Sistema de armazenamento melhorado
-    const Storage = {
-        isSupported() {
-            try {
-                const test = 'localStorage-test';
-                localStorage.setItem(test, test);
-                localStorage.removeItem(test);
-                return true;
-            } catch (e) {
-                return false;
-            }
-        },
-
-        set(key, value) {
-            try {
-                const data = {
-                    value: value,
-                    timestamp: Date.now(),
-                    version: '1.0'
-                };
-                localStorage.setItem(key, JSON.stringify(data));
-                this.updateUsageInfo();
-                return true;
-            } catch (e) {
-                console.error('Erro ao salvar dados:', e);
-                App.showNotification('Erro ao salvar dados. Memória cheia?', 'error');
-                return false;
-            }
-        },
-
-        get(key) {
-            try {
-                const item = localStorage.getItem(key);
-                if (!item) return null;
-                
-                const data = JSON.parse(item);
-                return data.value;
-            } catch (e) {
-                console.error('Erro ao carregar dados:', e);
-                return null;
-            }
-        },
-
-        remove(key) {
-            try {
-                localStorage.removeItem(key);
-                this.updateUsageInfo();
-                return true;
-            } catch (e) {
-                console.error('Erro ao remover dados:', e);
-                return false;
-            }
-        },
-
-        getUsage() {
-            let total = 0;
-            for (let key in localStorage) {
-                if (localStorage.hasOwnProperty(key)) {
-                    total += localStorage[key].length + key.length;
-                }
-            }
-            return {
-                used: total,
-                usedMB: (total / 1024 / 1024).toFixed(2),
-                items: localStorage.length
-            };
-        },
-
-        updateUsageInfo() {
-            const usage = this.getUsage();
-            const dataInfo = document.getElementById('dataInfo');
-            if (dataInfo) {
-                dataInfo.textContent = `💾 Dados: ${usage.items} itens (${usage.usedMB}MB)`;
-            }
-        },
-
-        exportData() {
-            const allData = {};
-            for (let key in localStorage) {
-                if (localStorage.hasOwnProperty(key)) {
-                    allData[key] = localStorage[key];
-                }
-            }
-            
-            const dataStr = JSON.stringify(allData, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `controle-gastos-backup-${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            
-            App.showNotification('Backup exportado com sucesso! 📥', 'success');
-        },
-
-        importData(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    // Confirmar importação
-                    if (!confirm('⚠️ Isso irá substituir todos os dados atuais. Continuar?')) {
-                        return;
-                    }
-                    
-                    // Limpar dados atuais
-                    localStorage.clear();
-                    
-                    // Importar novos dados
-                    for (let key in data) {
-                        localStorage.setItem(key, data[key]);
-                    }
-                    
-                    App.showNotification('Dados importados com sucesso! 📤', 'success');
-                    setTimeout(() => location.reload(), 1500);
-                    
-                } catch (error) {
-                    App.showNotification('Erro ao importar dados. Arquivo inválido.', 'error');
-                }
-            };
-            reader.readAsText(file);
-        }
-    };
-
     const App = {
         currentUser: null,
         
         init() {
-            this.checkStorageSupport();
             this.bindLoginEvents();
             this.checkAutoLogin();
-        },
-
-        checkStorageSupport() {
-            const statusDiv = document.getElementById('storageStatus');
-            const infoP = document.getElementById('storageInfo');
-            const usageP = document.getElementById('storageUsage');
-            
-            if (Storage.isSupported()) {
-                statusDiv.classList.remove('error');
-                infoP.textContent = '✅ localStorage disponível - dados serão salvos permanentemente!';
-                
-                const usage = Storage.getUsage();
-                usageP.textContent = `Uso atual: ${usage.items} itens (${usage.usedMB}MB de ~5MB disponíveis)`;
-            } else {
-                statusDiv.classList.add('error');
-                infoP.textContent = '❌ localStorage não suportado - dados não serão salvos!';
-                usageP.textContent = 'Verifique se não está em modo privado/incógnito';
-            }
         },
 
         bindLoginEvents() {
             document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
             document.getElementById('registerBtn').addEventListener('click', (e) => this.handleRegister(e));
             document.getElementById('logoutBtn').addEventListener('click', (e) => this.handleLogout(e));
-            document.getElementById('exportBtn').addEventListener('click', () => Storage.exportData());
-            document.getElementById('importBtn').addEventListener('click', () => {
-                document.getElementById('importFile').click();
-            });
-            document.getElementById('importFile').addEventListener('change', (e) => {
-                if (e.target.files[0]) {
-                    Storage.importData(e.target.files[0]);
-                }
-            });
         },
 
         checkAutoLogin() {
-            const user = Storage.get('currentUser');
+            // Verificar se há usuário logado salvo no localStorage
+            const user = localStorage.getItem('currentUser');
             if (user) {
                 this.currentUser = user;
                 this.showApp();
+            }
+        },
+
+        handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                this.showNotification('Preencha usuário e senha!', 'error');
+                return;
+            }
+
+            // Sistema simples de validação
+            const users = this.getUsers();
+            
+            if (users[username] && users[username] === password) {
+                this.currentUser = username;
+                localStorage.setItem('currentUser', username);
+                this.showApp();
+                this.showNotification(`Bem-vindo, ${username}! 🎉`, 'success');
+            } else {
+                this.showNotification('Usuário ou senha incorretos!', 'error');
+            }
+        },
+
+        handleRegister(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                this.showNotification('Preencha usuário e senha!', 'error');
+                return;
+            }
+
+            if (username.length < 3) {
+                this.showNotification('Usuário deve ter pelo menos 3 caracteres!', 'error');
+                return;
+            }
+
+            if (password.length < 4) {
+                this.showNotification('Senha deve ter pelo menos 4 caracteres!', 'error');
+                return;
+            }
+
+            const users = this.getUsers();
+            
+            if (users[username]) {
+                this.showNotification('Usuário já existe! Tente outro nome.', 'error');
+                return;
+            }
+
+            // Criar novo usuário
+            users[username] = password;
+            this.saveUsers(users);
+            
+            this.currentUser = username;
+            localStorage.setItem('currentUser', username);
+            this.showApp();
+            this.showNotification(`Conta criada com sucesso! Bem-vindo, ${username}! 🎉`, 'success');
+        },
+
+        handleLogout(e) {
+            e.preventDefault();
+            
+            if (confirm('Tem certeza que deseja sair?')) {
+                this.currentUser = null;
+                localStorage.removeItem('currentUser');
+                this.showLogin();
+                this.showNotification('Logout realizado com sucesso! 👋', 'success');
+            }
+        },
+
+        showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+            document.getElementById('loginForm').reset();
+        },
+
+        showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            document.getElementById('currentUser').textContent = this.currentUser;
+            
+            // Inicializar o controle de gastos
+            ExpenseTracker.init();
+        },
+
+        getUsers() {
+            // Salvar usuários no localStorage
+            const users = localStorage.getItem('appUsers');
+            return users ? JSON.parse(users) : {};
+        },
+
+        saveUsers(users) {
+            localStorage.setItem('appUsers', JSON.stringify(users));
+        },
+
+        showNotification(message, type = 'success') {
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            requestAnimationFrame(() => {
+                notification.classList.add('show');
+            });
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+    };
+
+    const ExpenseTracker = {
+        state: {
+            expenses: [],
+            limits: { Nubank: 0, Itaú: 0 },
+            currentFilter: 'todos',
+        },
+        elements: {},
+
+        init() {
+            this.loadUserData();
+            this.cacheElements();
+            this.bindEvents();
+            this.render();
+            console.log('🚀 Controle de Gastos inicializado para:', App.currentUser);
+        },
+
+        loadUserData() {
+            // Carregar dados específicos do usuário do localStorage
+            const userKey = `userData_${App.currentUser}`;
+            const userData = localStorage.getItem(userKey);
+            
+            if (userData) {
+                this.state = { ...this.state, ...JSON.parse(userData) };
+            }
+        },
+
+        saveUserData() {
+            // Salvar dados específicos do usuário no localStorage
+            const userKey = `userData_${App.currentUser}`;
+            localStorage.setItem(userKey, JSON.stringify(this.state));
+        },
+
+        _getAllUserData() {
+            // Não precisamos mais destes métodos com localStorage
+            return {};
+        },
+
+        _setAllUserData(data) {
+            // Não precisamos mais destes métodos com localStorage
+        },
+
+        cacheElements() {
+            this.elements = {
+                nubank: {
+                    total: document.getElementById('nubankTotal'),
+                    limitText: document.getElementById('nubankLimitText'),
+                    progress: document.getElementById('nubankProgress'),
+                    limitInput: document.getElementById('nubankLimitInput'),
+                },
+                itau: {
+                    total: document.getElementById('itauTotal'),
+                    limitText: document.getElementById('itauLimitText'),
+                    progress: document.getElementById('itauProgress'),
+                    limitInput: document.getElementById('itauLimitInput'),
+                },
+                setLimitsBtn: document.getElementById('setLimitsBtn'),
+                expenseForm: document.getElementById('expenseForm'),
+                descriptionInput: document.getElementById('descriptionInput'),
+                amountInput: document.getElementById('amountInput'),
+                cardSelect: document.getElementById('cardSelect'),
+                expenseList: document.getElementById('expenseList'),
+                clearExpensesBtn: document.getElementById('clearExpensesBtn'),
+                alertContainer: document.getElementById('alertContainer'),
+                filterTabs: document.querySelector('.filter-tabs'),
+            };
+        },
+
+        bindEvents() {
+            this.elements.setLimitsBtn.addEventListener('click', (e) => this.handleSetLimits(e));
+            this.elements.expenseForm.addEventListener('submit', (e) => this.handleAddExpense(e));
+            this.elements.clearExpensesBtn.addEventListener('click', (e) => this.handleClearExpenses(e));
+            this.elements.filterTabs.addEventListener('click', (e) => this.handleFilter(e));
+        },
+
+        handleSetLimits(e) {
+            e.preventDefault();
+            
+            const nubank = parseFloat(this.elements.nubank.limitInput.value) || 0;
+            const itau = parseFloat(this.elements.itau.limitInput.value) || 0;
+
+            if (nubank === 0 && itau === 0) {
+                App.showNotification('Por favor, defina pelo menos um limite.', 'error');
+                return;
+            }
+
+            this.state.limits = { 
+                Nubank: nubank || this.state.limits.Nubank, 
+                Itaú: itau || this.state.limits.Itaú 
+            };
+
+            this.saveUserData();
+            App.showNotification('Limites definidos com sucesso! 🎯', 'success');
+            this.render();
+        },
+
+        handleAddExpense(event) {
+            event.preventDefault();
+            
+            const description = this.elements.descriptionInput.value.trim();
+            const amount = parseFloat(this.elements.amountInput.value);
+            const card = this.elements.cardSelect.value;
+
+            if (!description) {
+                App.showNotification('Por favor, insira uma descrição.', 'error');
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                App.showNotification('Por favor, insira um valor válido.', 'error');
+                return;
+            }
+
+            if (amount > 10000) {
+                if (!confirm('Valor muito alto! Tem certeza que deseja registrar este gasto?')) {
+                    return;
+                }
+            }
+
+            const newExpense = {
+                id: Date.now(),
+                description,
+                amount,
+                card,
+                date: new Date().toLocaleDateString('pt-BR'),
+                timestamp: new Date()
+            };
+
+            this.state.expenses.unshift(newExpense);
+            this.elements.expenseForm.reset();
+            this.saveUserData();
+            App.showNotification(`Gasto de ${this.utils.formatCurrency(amount)} registrado! 💸`, 'success');
+            this.render();
+        },
+
+        handleClearExpenses() {
+            if (this.state.expenses.length === 0) {
+                App.showNotification('Não há gastos para remover.', 'error');
+                return;
+            }
+
+            if (confirm('⚠️ Tem certeza que deseja apagar todos os gastos? Esta ação não pode ser desfeita.')) {
+                this.state.expenses = [];
+                this.saveUserData();
+                App.showNotification('Todos os gastos foram removidos. 🗑️', 'success');
+                this.render();
+            }
+        },
+
+        handleFilter(event) {
+            if (event.target.classList.contains('filter-tab')) {
+                this.state.currentFilter = event.target.dataset.filter;
+                this.render();
+            }
+        },
+
+        render() {
+            this.updateTotals();
+            this.updateProgressBars();
+            this.renderExpenseList();
+            this.renderAlerts();
+            this.updateFormInputs();
+            this.updateFilterTabs();
+        },
+
+        updateTotals() {
+            const totals = this.calculateTotals();
+            const { formatCurrency } = this.utils;
+            
+            this.elements.nubank.total.textContent = formatCurrency(totals.Nubank);
+            this.elements.itau.total.textContent = formatCurrency(totals.Itaú);
+            
+            this.elements.nubank.limitText.textContent = `Limite: ${formatCurrency(this.state.limits.Nubank)}`;
+            this.elements.itau.limitText.textContent = `Limite: ${formatCurrency(this.state.limits.Itaú)}`;
+        },
+
+        updateProgressBars() {
+            const totals = this.calculateTotals();
+            const { calculatePercentage } = this.utils;
+
+            this.elements.nubank.progress.style.width = calculatePercentage(totals.Nubank, this.state.limits.Nubank);
+            this.elements.itau.progress.style.width = calculatePercentage(totals.Itaú, this.state.limits.Itaú);
+        },
+
+        renderExpenseList() {
+            const filtered = this.getFilteredExpenses();
+            
+            if (filtered.length === 0) {
+                const message = this.state.currentFilter === 'todos' 
+                    ? '🤷‍♂️ Nenhum gasto registrado ainda.<br><small>Comece adicionando seus gastos!</small>'
+                    : `📭 Nenhum gasto no ${this.state.currentFilter}.<br><small>Tente outro filtro!</small>`;
+                    
+                this.elements.expenseList.innerHTML = `<div class="no-expenses">${message}</div>`;
+                return;
+            }
+
+            this.elements.expenseList.innerHTML = filtered.map((expense, index) => `
+                <div class="expense-item" style="animation: slideIn 0.3s ease ${index * 0.1}s both">
+                    <div class="expense-info">
+                        <div class="expense-description">${this.utils.escapeHtml(expense.description)}</div>
+                        <span class="expense-card-badge ${expense.card}">${expense.card}</span>
+                    </div>
+                    <div class="expense-amount">${this.utils.formatCurrency(expense.amount)}</div>
+                </div>
+            `).join('');
+        },
+
+        renderAlerts() {
+            const totals = this.calculateTotals();
+            const alerts = this.generateAlerts(totals);
+
+            this.elements.alertContainer.innerHTML = alerts.map(alert => `
+                <div class="alert alert-${alert.type}">${alert.message}</div>
+            `).join('');
+        },
+
+        updateFormInputs() {
+            const { limits } = this.state;
+            
+            if (!this.elements.nubank.limitInput.value && limits.Nubank > 0) {
+                this.elements.nubank.limitInput.value = limits.Nubank;
+            }
+            if (!this.elements.itau.limitInput.value && limits.Itaú > 0) {
+                this.elements.itau.limitInput.value = limits.Itaú;
+            }
+        },
+
+        updateFilterTabs() {
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.filter === this.state.currentFilter);
+            });
+        },
+
+        calculateTotals() {
+            return {
+                Nubank: this.state.expenses.filter(e => e.card === 'Nubank').reduce((sum, exp) => sum + exp.amount, 0),
+                Itaú: this.state.expenses.filter(e => e.card === 'Itaú').reduce((sum, exp) => sum + exp.amount, 0),
+            };
+        },
+
+        getFilteredExpenses() {
+            return this.state.expenses.filter(expense => 
+                this.state.currentFilter === 'todos' || expense.card === this.state.currentFilter
+            );
+        },
+
+        generateAlerts(totals) {
+            const alerts = [];
+            const { limits } = this.state;
+
+            ['Nubank', 'Itaú'].forEach(card => {
+                if (limits[card] > 0) {
+                    const percentage = (totals[card] / limits[card]) * 100;
+                    
+                    if (percentage >= 100) {
+                        alerts.push({
+                            type: 'danger',
+                            message: `🚨 ${card.toUpperCase()}: Limite estourado! Pare de usar este cartão!`
+                        });
+                    } else if (percentage >= 90) {
+                        alerts.push({
+                            type: 'warning',
+                            message: `🔥 ${card.toUpperCase()}: Quase estourando! ${Math.round(percentage)}% usado.`
+                        });
+                    } else if (percentage >= 80) {
+                        alerts.push({
+                            type: 'warning',
+                            message: `⚠️ ${card.toUpperCase()}: Você usou ${Math.round(percentage)}% do limite.`
+                        });
+                    }
+                }
+            });
+
+            return alerts;
+        },
+
+        utils: {
+            formatCurrency(value) {
+                return new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                }).format(value);
+            },
+
+            calculatePercentage(value, limit) {
+                if (limit <= 0) return '0%';
+                return `${Math.min((value / limit) * 100, 100)}%`;
+            },
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            App.init();
+        } catch (error) {
+            console.error('Erro ao inicializar o aplicativo:', error);
+            document.body.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #e53e3e;">
+                    <h2>⚠️ Erro ao carregar o aplicativo</h2>
+                    <p>Por favor, recarregue a página.</p>
+                </div>
+            `;
+        }
+    });
+</script>
 ```
+
+</body>
+</html>
