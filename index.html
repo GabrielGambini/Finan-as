@@ -946,11 +946,6 @@
                             <input type="hidden" id="category" required>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="date">Data</label>
-                            <input type="date" id="date" class="form-control" required>
-                        </div>
-                        
                         <button type="submit" class="btn btn-primary">💾 Adicionar Gasto</button>
                     </form>
                 </div>
@@ -960,9 +955,8 @@
                     <!-- Filtros -->
                     <div class="filter-tabs">
                         <button class="filter-tab active" data-filter="all">Todos</button>
-                        <button class="filter-tab" data-filter="today">Hoje</button>
-                        <button class="filter-tab" data-filter="week">Semana</button>
-                        <button class="filter-tab" data-filter="month">Mês</button>
+                        <button class="filter-tab" data-filter="Nubank">Nubank</button>
+                        <button class="filter-tab" data-filter="Itaú">Itaú</button>
                     </div>
 
                     <!-- Lista de Gastos -->
@@ -1061,10 +1055,6 @@
                         <button type="button" class="category-btn edit-category-btn" data-category="Outros">📦 Outros</button>
                     </div>
                     <input type="hidden" id="editCategory" required>
-                </div>
-                <div class="form-group">
-                    <label for="editDate">Data</label>
-                    <input type="date" id="editDate" class="form-control" required>
                 </div>
                 <input type="hidden" id="editId">
                 <button type="submit" class="btn btn-primary">💾 Salvar Alterações</button>
@@ -1238,7 +1228,6 @@
             loadData();
             ensureMonthlyRollover();
             setupEventListeners();
-            setCurrentDate();
             checkAutoLogin();
         });
 
@@ -1701,12 +1690,12 @@
                 amount: parseFloat(document.getElementById('amount').value),
                 card: document.getElementById('card').value,
                 category: document.getElementById('category').value,
-                date: document.getElementById('date').value,
+                date: getTodayISODate(),
                 user: currentUser,
                 createdAt: new Date().toISOString()
             };
             
-            if (!expense.description || !expense.amount || !expense.card || !expense.category || !expense.date) {
+            if (!expense.description || !expense.amount || !expense.card || !expense.category) {
                 showNotification('Por favor, preencha todos os campos!', 'error');
                 return;
             }
@@ -1715,7 +1704,6 @@
             saveData();
             
             elements.expenseForm.reset();
-            setCurrentDate();
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
             
             renderCardsBreakdown();
@@ -1736,7 +1724,7 @@
                 amount: parseFloat(document.getElementById('editAmount').value),
                 card: document.getElementById('editCard').value,
                 category: document.getElementById('editCategory').value,
-                date: document.getElementById('editDate').value,
+                date: expenses.find(exp => exp.id === parseInt(document.getElementById('editId').value))?.date || getTodayISODate(),
                 user: currentUser,
                 updatedAt: new Date().toISOString()
             };
@@ -1767,7 +1755,6 @@
             document.getElementById('editAmount').value = expense.amount;
             document.getElementById('editCard').value = expense.card;
             document.getElementById('editCategory').value = expense.category;
-            document.getElementById('editDate').value = expense.date;
             
             // Ativar botão de categoria
             document.querySelectorAll('.edit-category-btn').forEach(btn => {
@@ -1890,31 +1877,8 @@
 
         // Filtrar gastos
         function filterExpenses(expenses) {
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const weekStart = new Date(today);
-            weekStart.setDate(today.getDate() - today.getDay());
-            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-            
-            switch (currentFilter) {
-                case 'today':
-                    return expenses.filter(exp => {
-                        const expDate = new Date(exp.date);
-                        return expDate >= today && expDate < new Date(today.getTime() + 86400000);
-                    });
-                case 'week':
-                    return expenses.filter(exp => {
-                        const expDate = new Date(exp.date);
-                        return expDate >= weekStart;
-                    });
-                case 'month':
-                    return expenses.filter(exp => {
-                        const expDate = new Date(exp.date);
-                        return expDate >= monthStart;
-                    });
-                default:
-                    return expenses;
-            }
+            if (currentFilter === 'all') return expenses;
+            return expenses.filter(exp => exp.card === currentFilter);
         }
 
         // Renderizar gastos
@@ -1939,7 +1903,6 @@
                                 <div class="expense-meta">
                                     <span class="expense-card-badge ${expense.card}">${expense.card}</span>
                                     <span class="expense-category-badge">${expense.category}</span>
-                                    <span class="expense-date">${date}</span>
                                 </div>
                             </div>
                             <div class="expense-amount">${formatCurrency(expense.amount)}</div>
@@ -2331,6 +2294,15 @@
                 getAdvancedStats
             };
             console.log('🎯 Expense Control App loaded! Use window.expenseApp for debugging.');
+        }
+
+        // Data atual em ISO (yyyy-mm-dd)
+        function getTodayISODate() {
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
         }
     </script>
 </body>
