@@ -375,6 +375,53 @@
             color: var(--text-color);
         }
 
+        /* Torna as abas de filtro roláveis horizontalmente em telas pequenas */
+        @media (max-width: 600px) {
+            .filter-tabs {
+                display: flex;
+                overflow-x: auto;
+                white-space: nowrap;
+                gap: 0.5rem;
+                padding-bottom: 4px;
+                margin-bottom: 8px;
+            }
+            .filter-tab {
+                flex: 0 0 auto;
+                min-width: 90px;
+                font-size: 0.95rem;
+                padding: 7px 12px;
+            }
+            .filter-tabs::-webkit-scrollbar {
+                display: none;
+            }
+            /* Cartões mais compactos */
+            .cards-breakdown {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 0;
+                margin: 0;
+            }
+            .card {
+                margin: 8px 0;
+                padding: 12px 10px;
+                border-radius: 14px;
+                font-size: 0.97rem;
+            }
+            .card h3 {
+                font-size: 1.05rem;
+                margin-bottom: 4px;
+            }
+            .card-limit,
+            .bank-meta {
+                font-size: 0.92rem;
+            }
+            .progress-bar-small {
+                height: 6px;
+                margin-top: 8px;
+            }
+        }
+
         .category-select {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -806,6 +853,7 @@
                 left: 10px;
                 min-width: auto;
                 transform: translateY(-100%);
+                top: 0.5px;
             }
             
             .notification.show {
@@ -813,7 +861,7 @@
             }
 
             .theme-toggle {
-                top: 10px;
+                top: 65px;
                 right: 10px;
                 width: 45px;
                 height: 45px;
@@ -849,6 +897,41 @@
 
             .summary-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cartões mais compactos e com menos padding no mobile */
+        @media (max-width: 600px) {
+            .cards-breakdown {
+                padding: 0;
+                margin: 0;
+            }
+            .card {
+                margin: 8px 0;
+                padding: 12px 10px;
+                border-radius: 14px;
+                font-size: 0.97rem;
+            }
+            .card h3 {
+                font-size: 1.05rem;
+                margin-bottom: 4px;
+            }
+            .card-limit,
+            .bank-meta {
+                font-size: 0.92rem;
+            }
+            .progress-bar-small {
+                height: 6px;
+                margin-top: 8px;
+            }
+        }
+
+        /* Se quiser ainda mais compacto, use grid para os cartões */
+        @media (max-width: 600px) {
+            .cards-breakdown {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 8px;
             }
         }
     </style>
@@ -1075,8 +1158,6 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
                         <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="pf-bank" data-bank="Nubank"> Nubank</label>
                         <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="pf-bank" data-bank="Itaú"> Itaú</label>
-                        <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="pf-bank" data-bank="Bradesco"> Bradesco</label>
-                        <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="pf-bank" data-bank="Santander"> Santander</label>
                     </div>
                 </div>
 
@@ -1116,68 +1197,13 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
                         <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="bank-checkbox" data-bank="Nubank"> Nubank</label>
                         <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="bank-checkbox" data-bank="Itaú"> Itaú</label>
-                        <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="bank-checkbox" data-bank="Bradesco"> Bradesco</label>
-                        <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="bank-checkbox" data-bank="Santander"> Santander</label>
                     </div>
                 </div>
 
                 <h4 style="margin: 1rem 0 1rem 0; color: var(--text-color); font-size: 1rem;">Configurar Limites dos Cartões:</h4>
                 
-                <div class="form-group bank-limit-group" data-bank="Nubank" style="display:none;">
-                    <label for="nubankLimit">Limite Nubank (R$)</label>
-                    <input type="number" id="nubankLimit" class="form-control" placeholder="Ex: 2000" step="0.01" min="0">
-                    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top:0.5rem;">
-                        <div>
-                            <label for="nubankClose">Dia de fechamento</label>
-                            <input type="number" id="nubankClose" class="form-control" placeholder="1-31" min="1" max="31">
-                        </div>
-                        <div>
-                            <label for="nubankDue">Dia de vencimento</label>
-                            <input type="number" id="nubankDue" class="form-control" placeholder="1-31" min="1" max="31">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group bank-limit-group" data-bank="Itaú" style="display:none;">
-                    <label for="itauLimit">Limite Itaú (R$)</label>
-                    <input type="number" id="itauLimit" class="form-control" placeholder="Ex: 1500" step="0.01" min="0">
-                    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top:0.5rem;">
-                        <div>
-                            <label for="itauClose">Dia de fechamento</label>
-                            <input type="number" id="itauClose" class="form-control" placeholder="1-31" min="1" max="31">
-                        </div>
-                        <div>
-                            <label for="itauDue">Dia de vencimento</label>
-                            <input type="number" id="itauDue" class="form-control" placeholder="1-31" min="1" max="31">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group bank-limit-group" data-bank="Bradesco" style="display:none;">
-                    <label for="bradescoLimit">Limite Bradesco (R$)</label>
-                    <input type="number" id="bradescoLimit" class="form-control" placeholder="Ex: 1000" step="0.01" min="0">
-                    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top:0.5rem;">
-                        <div>
-                            <label for="bradescoClose">Dia de fechamento</label>
-                            <input type="number" id="bradescoClose" class="form-control" placeholder="1-31" min="1" max="31">
-                        </div>
-                        <div>
-                            <label for="bradescoDue">Dia de vencimento</label>
-                            <input type="number" id="bradescoDue" class="form-control" placeholder="1-31" min="1" max="31">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group bank-limit-group" data-bank="Santander" style="display:none;">
-                    <label for="santanderLimit">Limite Santander (R$)</label>
-                    <input type="number" id="santanderLimit" class="form-control" placeholder="Ex: 800" step="0.01" min="0">
-                    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top:0.5rem;">
-                        <div>
-                            <label for="santanderClose">Dia de fechamento</label>
-                            <input type="number" id="santanderClose" class="form-control" placeholder="1-31" min="1" max="31">
-                        </div>
-                        <div>
-                            <label for="santanderDue">Dia de vencimento</label>
-                            <input type="number" id="santanderDue" class="form-control" placeholder="1-31" min="1" max="31">
-                        </div>
-                    </div>
+                <div id="bankLimitDetails">
+                    <!-- Detalhes por banco serão inseridos via JS -->
                 </div>
                 
                 <button type="submit" class="btn btn-primary">✨ Criar Conta</button>
@@ -1285,7 +1311,7 @@
             const bankMeta = users[currentUser].bankMeta || {};
             const limits = users[currentUser].cardLimits || {};
             const activeBanks = new Set(Array.from(document.querySelectorAll('.pf-bank:checked')).map(cb => cb.dataset.bank));
-            const allBanks = ['Nubank', 'Itaú', 'Bradesco', 'Santander'];
+            const allBanks = ['Nubank', 'Itaú'];
             const selected = allBanks.filter(b => activeBanks.has(b));
             if (selected.length === 0) {
                 container.innerHTML = '<div class="no-expenses">Selecione pelo menos um banco.</div>';
@@ -1294,7 +1320,7 @@
             container.innerHTML = selected.map(bank => {
                 const meta = bankMeta[bank] || {};
                 const limit = limits[bank] || 0;
-                const id = bank.toLowerCase();
+                const id = bank.toLowerCase().replace('ú', 'u'); // Itaú -> itau
                 return `
                     <div class="card" style="margin-bottom:1rem;">
                         <h3>${bank}</h3>
@@ -1320,7 +1346,7 @@
         function saveProfile(e) {
             e.preventDefault();
             if (!currentUser || !users[currentUser]) return;
-            const allBanks = ['Nubank', 'Itaú', 'Bradesco', 'Santander'];
+            const allBanks = ['Nubank', 'Itaú'];
             const selectedBanks = Array.from(document.querySelectorAll('.pf-bank:checked')).map(cb => cb.dataset.bank);
             if (selectedBanks.length === 0) {
                 showNotification('Selecione pelo menos um banco.', 'error');
@@ -1329,7 +1355,7 @@
             const newLimits = {};
             const newMeta = {};
             selectedBanks.forEach(bank => {
-                const id = bank.toLowerCase();
+                const id = bank.toLowerCase().replace('ú', 'u'); // Itaú -> itau
                 const limitVal = parseFloat(document.getElementById(`pf_${id}_limit`)?.value);
                 const closeVal = parseInt(document.getElementById(`pf_${id}_close`)?.value);
                 const dueVal = parseInt(document.getElementById(`pf_${id}_due`)?.value);
@@ -1351,25 +1377,52 @@
             renderExpenses();
             renderAnalysis();
             checkLimitsAndAlerts();
+            setupFilterTabs();
             showNotification('Perfil atualizado com sucesso!');
         }
 
         // Inicializar seleção de bancos no modal de registro
         function initBankSelection() {
+            buildBankLimitDetails();
             const checkboxes = document.querySelectorAll('.bank-checkbox');
-            const limitGroups = document.querySelectorAll('.bank-limit-group');
-            function updateVisibility() {
-                limitGroups.forEach(group => {
-                    const bank = group.getAttribute('data-bank');
-                    const checked = Array.from(checkboxes).some(cb => cb.dataset.bank === bank && cb.checked);
-                    group.style.display = checked ? '' : 'none';
-                });
-            }
             checkboxes.forEach(cb => {
-                cb.removeEventListener('change', updateVisibility);
-                cb.addEventListener('change', updateVisibility);
+                cb.removeEventListener('change', buildBankLimitDetails);
+                cb.addEventListener('change', buildBankLimitDetails);
             });
-            updateVisibility();
+        }
+
+        // Construir detalhes dos limites dos bancos no modal de registro
+        function buildBankLimitDetails() {
+            const container = document.getElementById('bankLimitDetails');
+            const selectedBanks = Array.from(document.querySelectorAll('.bank-checkbox:checked')).map(cb => cb.dataset.bank);
+            
+            if (selectedBanks.length === 0) {
+                container.innerHTML = '<div class="no-expenses">Selecione pelo menos um banco para configurar os limites.</div>';
+                return;
+            }
+            
+            container.innerHTML = selectedBanks.map(bank => {
+                const id = bank.toLowerCase().replace('ú', 'u'); // Itaú -> itau
+                return `
+                    <div class="card" style="margin-bottom:1rem;">
+                        <h3>${bank}</h3>
+                        <div class="form-group">
+                            <label for="${id}Limit">Limite ${bank} (R$)</label>
+                            <input type="number" id="${id}Limit" class="form-control" step="0.01" min="0" placeholder="Ex: 5000.00">
+                        </div>
+                        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+                            <div>
+                                <label for="${id}Close">Dia de fechamento</label>
+                                <input type="number" id="${id}Close" class="form-control" min="1" max="31" placeholder="Ex: 15">
+                            </div>
+                            <div>
+                                <label for="${id}Due">Dia de vencimento</label>
+                                <input type="number" id="${id}Due" class="form-control" min="1" max="31" placeholder="Ex: 10">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Configurar botões de categoria
@@ -1390,9 +1443,32 @@
 
         // Configurar abas de filtro
         function setupFilterTabs() {
-            document.querySelectorAll('.filter-tab').forEach(tab => {
+            const filterTabs = document.querySelector('.filter-tabs');
+            if (!filterTabs) return;
+
+            filterTabs.innerHTML = '';
+
+            // Aba "Todos"
+            const allBtn = document.createElement('button');
+            allBtn.className = 'filter-tab active';
+            allBtn.dataset.filter = 'all';
+            allBtn.textContent = 'Todos';
+            filterTabs.appendChild(allBtn);
+
+            // Abas dos bancos permitidos
+            const allowedBanks = currentUser && users[currentUser] ? Object.keys(users[currentUser].cardLimits || {}) : [];
+            allowedBanks.forEach(bank => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-tab';
+                btn.dataset.filter = bank;
+                btn.textContent = bank;
+                filterTabs.appendChild(btn);
+            });
+
+            // Evento de filtro
+            filterTabs.querySelectorAll('.filter-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    filterTabs.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
                     currentFilter = this.dataset.filter;
                     renderExpenses();
@@ -1589,24 +1665,17 @@
                 showNotification('Selecione pelo menos um banco para continuar.', 'error');
                 return;
             }
-            const inputsByBank = {
-                'Nubank': 'nubankLimit',
-                'Itaú': 'itauLimit',
-                'Bradesco': 'bradescoLimit',
-                'Santander': 'santanderLimit'
-            };
             const cardLimits = {};
             const bankMeta = {};
             selectedBanks.forEach(bank => {
-                const inputId = inputsByBank[bank];
-                const raw = document.getElementById(inputId)?.value;
-                const val = parseFloat(raw);
-                cardLimits[bank] = isNaN(val) ? 0 : val;
-                const close = parseInt(document.getElementById(bank.toLowerCase() + 'Close')?.value);
-                const due = parseInt(document.getElementById(bank.toLowerCase() + 'Due')?.value);
+                const id = bank.toLowerCase().replace('ú', 'u'); // Itaú -> itau
+                const limitVal = parseFloat(document.getElementById(`${id}Limit`)?.value);
+                const closeVal = parseInt(document.getElementById(`${id}Close`)?.value);
+                const dueVal = parseInt(document.getElementById(`${id}Due`)?.value);
+                cardLimits[bank] = isNaN(limitVal) ? 0 : limitVal;
                 bankMeta[bank] = {
-                    closeDay: isNaN(close) ? null : close,
-                    dueDay: isNaN(due) ? null : due
+                    closeDay: isNaN(closeVal) ? null : closeVal,
+                    dueDay: isNaN(dueVal) ? null : dueVal
                 };
             });
             
@@ -1624,7 +1693,7 @@
             // Limpar formulário
             elements.registerForm.reset();
             document.querySelectorAll('.bank-checkbox').forEach(cb => cb.checked = false);
-            document.querySelectorAll('.bank-limit-group').forEach(group => group.style.display = 'none');
+            document.getElementById('bankLimitDetails').innerHTML = '';
         }
 
         // Handle logout
@@ -1653,6 +1722,7 @@
             renderExpenses();
             renderAnalysis();
             checkLimitsAndAlerts();
+            setupFilterTabs();
         }
 
         // Preencher selects de cartão com bancos do usuário
@@ -1877,7 +1947,10 @@
 
         // Filtrar gastos
         function filterExpenses(expenses) {
-            if (currentFilter === 'all') return expenses;
+            if (currentFilter === 'all') {
+                return expenses;
+            }
+            // Filtra pelo cartão selecionado na aba
             return expenses.filter(exp => exp.card === currentFilter);
         }
 
@@ -1957,7 +2030,7 @@
             // Análise por categorias
             const categoryTotals = {};
             monthlyExpenses.forEach(exp => {
-                categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
+                categoryTotals[exp.category] = (categoryTotals[exp.category] ||  0) + exp.amount;
             });
             
             renderRanking('categoryRanking', categoryTotals, totalMonth);
