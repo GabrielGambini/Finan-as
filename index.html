@@ -1513,12 +1513,12 @@
         // Salvar tema
         function saveTheme() {
             const isDark = document.body.hasAttribute('data-theme');
-            sessionStorage.setItem('theme', isDark ? 'dark' : 'light');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         }
 
         // Carregar tema
         function loadTheme() {
-            const savedTheme = sessionStorage.getItem('theme');
+            const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
                 document.body.setAttribute('data-theme', 'dark');
                 elements.themeToggle.textContent = '☀️';
@@ -1534,8 +1534,8 @@
         // Carregar dados
         function loadData() {
             loadTheme();
-            const savedUsers = sessionStorage.getItem('expenseUsers');
-            const savedExpenses = sessionStorage.getItem('expenses');
+            const savedUsers = localStorage.getItem('expenseUsers');
+            const savedExpenses = localStorage.getItem('expenses');
             
             if (savedUsers) {
                 users = JSON.parse(savedUsers);
@@ -1548,8 +1548,8 @@
 
         // Salvar dados
         function saveData() {
-            sessionStorage.setItem('expenseUsers', JSON.stringify(users));
-            sessionStorage.setItem('expenses', JSON.stringify(expenses));
+            localStorage.setItem('expenseUsers', JSON.stringify(users));
+            localStorage.setItem('expenses', JSON.stringify(expenses));
         }
 
         // Helpers de mês
@@ -1571,10 +1571,10 @@
         function ensureMonthlyRollover() {
             try {
                 const currentKey = getCurrentMonthKey();
-                const activeMonth = sessionStorage.getItem('activeMonth');
+                const activeMonth = localStorage.getItem('activeMonth');
                 let archives = {};
                 try {
-                    archives = JSON.parse(sessionStorage.getItem('expenseArchives') || '{}') || {};
+                    archives = JSON.parse(localStorage.getItem('expenseArchives') || '{}') || {};
                 } catch (_) {
                     archives = {};
                 }
@@ -1594,14 +1594,14 @@
                             archives[userKey][monthKey].push(exp);
                         });
                         expenses = remaining;
-                        sessionStorage.setItem('expenseArchives', JSON.stringify(archives));
+                        localStorage.setItem('expenseArchives', JSON.stringify(archives));
                         saveData();
                     }
                 }
 
                 // Garante que o mês ativo esteja sempre atualizado
                 if (activeMonth !== currentKey) {
-                    sessionStorage.setItem('activeMonth', currentKey);
+                    localStorage.setItem('activeMonth', currentKey);
                 }
             } catch (e) {
                 console.warn('Falha ao processar virada de mês:', e);
@@ -1610,7 +1610,7 @@
 
         // Verificar login automático
         function checkAutoLogin() {
-            const savedUser = sessionStorage.getItem('currentUser');
+            const savedUser = localStorage.getItem('currentUser');
             if (savedUser && users[savedUser]) {
                 currentUser = savedUser;
                 showMainApp();
@@ -1630,7 +1630,7 @@
             
             if (users[username] && users[username].password === password) {
                 currentUser = username;
-                sessionStorage.setItem('currentUser', currentUser);
+                localStorage.setItem('currentUser', currentUser);
                 showMainApp();
                 showNotification('Login realizado com sucesso!');
             } else {
@@ -1699,7 +1699,7 @@
         // Handle logout
         function handleLogout() {
             currentUser = null;
-            sessionStorage.removeItem('currentUser');
+            localStorage.removeItem('currentUser');
             showLoginScreen();
             showNotification('Logout realizado com sucesso!');
         }
@@ -1994,7 +1994,7 @@
         // Utilitário para consultar arquivos de meses anteriores por usuário
         function getArchivedExpenses(user, monthKey) {
             try {
-                const archives = JSON.parse(sessionStorage.getItem('expenseArchives') || '{}') || {};
+                const archives = JSON.parse(localStorage.getItem('expenseArchives') || '{}') || {};
                 if (!user) return [];
                 if (!archives[user]) return [];
                 if (monthKey) return archives[user][monthKey] || [];
@@ -2241,17 +2241,17 @@
                 userSettings: users[currentUser]
             };
             
-            sessionStorage.setItem(`backup_${currentUser}_${Date.now()}`, JSON.stringify(backupData));
+            localStorage.setItem(`backup_${currentUser}_${Date.now()}`, JSON.stringify(backupData));
             
             // Manter apenas os 3 backups mais recentes
-            const backupKeys = Object.keys(sessionStorage)
+            const backupKeys = Object.keys(localStorage)
                 .filter(key => key.startsWith(`backup_${currentUser}_`))
                 .sort()
                 .reverse();
                 
             if (backupKeys.length > 3) {
                 backupKeys.slice(3).forEach(key => {
-                    sessionStorage.removeItem(key);
+                    localStorage.removeItem(key);
                 });
             }
         }
