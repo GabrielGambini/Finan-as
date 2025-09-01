@@ -1036,10 +1036,8 @@
                 <!-- Lista de Gastos e Análises -->
                 <div>
                     <!-- Filtros -->
-                    <div class="filter-tabs">
-                        <button class="filter-tab active" data-filter="all">Todos</button>
-                        <button class="filter-tab" data-filter="Nubank">Nubank</button>
-                        <button class="filter-tab" data-filter="Itaú">Itaú</button>
+                    <div class="filter-tabs" id="filterTabs">
+                        <!-- Filtros serão gerados dinamicamente pelo JavaScript -->
                     </div>
 
                     <!-- Lista de Gastos -->
@@ -1443,7 +1441,7 @@
 
         // Configurar abas de filtro
         function setupFilterTabs() {
-            const filterTabs = document.querySelector('.filter-tabs');
+            const filterTabs = document.getElementById('filterTabs');
             if (!filterTabs) return;
 
             filterTabs.innerHTML = '';
@@ -1464,6 +1462,12 @@
                 btn.textContent = bank;
                 filterTabs.appendChild(btn);
             });
+
+            // Se não há bancos, mostrar mensagem
+            if (allowedBanks.length === 0) {
+                filterTabs.innerHTML = '<div class="no-expenses">Configure seus bancos no Perfil para começar</div>';
+                return;
+            }
 
             // Evento de filtro
             filterTabs.querySelectorAll('.filter-tab').forEach(tab => {
