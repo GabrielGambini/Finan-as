@@ -1786,76 +1786,15 @@
             checkLimitsAndAlerts();
             
             showNotification(`Gasto de ${formatCurrency(expense.amount)} adicionado com sucesso!`);
-        }
-
-        // Handle editar gasto
-        function handleEditExpense(e) {
-            e.preventDefault();
             
-            const expense = {
-                id: parseInt(document.getElementById('editId').value),
-                description: document.getElementById('editDescription').value.trim(),
-                amount: parseFloat(document.getElementById('editAmount').value),
-                card: document.getElementById('editCard').value,
-                category: document.getElementById('editCategory').value,
-                date: expenses.find(exp => exp.id === parseInt(document.getElementById('editId').value))?.date || getTodayISODate(),
-                user: currentUser,
-                updatedAt: new Date().toISOString()
-            };
-            
-            const index = expenses.findIndex(exp => exp.id === expense.id && exp.user === currentUser);
-            if (index !== -1) {
-                expenses[index] = { ...expenses[index], ...expense };
-                saveData();
-                
-                hideModal('editModal');
-                renderCardsBreakdown();
-                renderExpenses();
-                renderAnalysis();
-                checkLimitsAndAlerts();
-                
-                showNotification('Gasto editado com sucesso!');
-            }
-        }
-
-        // Editar gasto
-        function editExpense(id) {
-            const expense = expenses.find(exp => exp.id === id && exp.user === currentUser);
-            if (!expense) return;
-            
-            populateCardSelects();
-            document.getElementById('editId').value = expense.id;
-            document.getElementById('editDescription').value = expense.description;
-            document.getElementById('editAmount').value = expense.amount;
-            document.getElementById('editCard').value = expense.card;
-            document.getElementById('editCategory').value = expense.category;
-            
-            // Ativar botão de categoria
-            document.querySelectorAll('.edit-category-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.category === expense.category);
-            });
-            
-            showModal('editModal');
-        }
-
-        // Deletar gasto
-        function deleteExpense(id) {
-            if (!confirm('Tem certeza que deseja excluir este gasto?')) return;
-            
-            expenses = expenses.filter(exp => !(exp.id === id && exp.user === currentUser));
-            saveData();
-            
-            renderCardsBreakdown();
-            renderExpenses();
-            renderAnalysis();
-            checkLimitsAndAlerts();
-            
-            showNotification('Gasto excluído com sucesso!');
         }
 
         // Renderizar breakdown dos cartões
         function renderCardsBreakdown() {
-            if (!currentUser || !users[currentUser]) return;
+            if (!currentUser || !users[currentUser] || !users[currentUser].cardLimits) {
+                elements.cardsBreakdown.innerHTML = '<div class="no-expenses">Configure seus bancos no Perfil para começar</div>';
+                return;
+            }
             
             const userExpenses = getUserExpenses();
             const currentMonth = new Date().getMonth();
@@ -1868,19 +1807,21 @@
             const cardLimits = users[currentUser].cardLimits;
             const cardTotals = {};
             
-            // Calcular totais por cartão
+            // Calcular totais por cartão - CORRIGIDO
             Object.keys(cardLimits).forEach(card => {
-                cardTotals[card] = monthlyExpenses
-                    .filter(exp => exp.card === card)
-                    .reduce((sum, exp) => sum + exp.amount, 0);
+                const cardExpenses = monthlyExpenses.filter(exp => exp.card === card);
+                cardTotals[card] = cardExpenses.reduce((sum, exp) => {
+                    const amount = parseFloat(exp.amount) || 0;
+                    return sum + amount;
+                }, 0);
             });
             
             let html = '';
             Object.keys(cardLimits).forEach(card => {
-                const used = cardTotals[card];
-                const limit = cardLimits[card];
+                const used = cardTotals[card] || 0; // CORRIGIDO - garantir que não seja undefined
+                const limit = parseFloat(cardLimits[card]) || 0; // CORRIGIDO
                 const percentage = limit > 0 ? (used / limit) * 100 : 0;
-                const remaining = limit - used;
+                const remaining = Math.max(0, limit - used); // CORRIGIDO - evitar valores negativos
                 const meta = users[currentUser].bankMeta ? users[currentUser].bankMeta[card] : null;
                 const metaText = meta && (meta.closeDay || meta.dueDay)
                     ? ` | <span class="bank-meta">fechamento: ${meta.closeDay || '-'} · vencimento: ${meta.dueDay || '-'}</span>`
@@ -1898,12 +1839,16 @@
                 `;
             });
             
+            if (html === '') {
+                html = '<div class="no-expenses">Configure seus bancos no Perfil para começar</div>';
+            }
+            
             elements.cardsBreakdown.innerHTML = html;
         }
 
         // Verificar limites e alertas
         function checkLimitsAndAlerts() {
-            if (!currentUser || !users[currentUser]) return;
+            if (!currentUser || !users[currentUser] || !users[currentUser].cardLimits) return;
             
             const userExpenses = getUserExpenses();
             const currentMonth = new Date().getMonth();
@@ -1917,10 +1862,12 @@
             const alerts = [];
             
             Object.keys(cardLimits).forEach(card => {
-                const used = monthlyExpenses
-                    .filter(exp => exp.card === card)
-                    .reduce((sum, exp) => sum + exp.amount, 0);
-                const limit = cardLimits[card];
+                const cardExpenses = monthlyExpenses.filter(exp => exp.card === card);
+                const used = cardExpenses.reduce((sum, exp) => {
+                    const amount = parseFloat(exp.amount) || 0;
+                    return sum + amount;
+                }, 0);
+                const limit = parseFloat(cardLimits[card]) || 0;
                 const percentage = limit > 0 ? (used / limit) * 100 : 0;
                 
                 if (percentage >= 100) {
