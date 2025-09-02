@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Gastos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="theme-toggle" id="themeToggle">🌙</div>
+
+    <!-- Tela de Login -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <h1 class="login-title">💳 Controle de Gastos</h1>
+            <p class="login-subtitle">Entre com seu usuário e senha</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" class="form-control" placeholder="Digite seu usuário" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" class="form-control" placeholder="Digite sua senha" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Entrar</button>
+                <button type="button" id="registerBtn" class="btn btn-secondary">Criar Nova Conta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Aplicação Principal -->
+    <div id="mainApp" class="hidden">
+        <div class="container">
+            <!-- Informações do Usuário -->
+            <div class="user-info">
+                <div>
+                    <strong>Bem-vindo(a), <span id="currentUser"></span>!</strong>
+                </div>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button class="logout-btn" id="profileBtn" style="background: var(--secondary-color);">Perfil</button>
+                    <button class="logout-btn" id="logoutBtn">Sair</button>
+                </div>
+            </div>
+
+            <!-- Header com Resumo -->
+            <div class="header">
+                <div class="header-content">
+                    <h1>💸 Controle de Gastos</h1>
+                    <p>Gerencie seus gastos de forma inteligente</p>
+                </div>
+                
+                <div class="cards-breakdown" id="cardsBreakdown">
+                    <!-- Cards serão inseridos aqui pelo JavaScript -->
+                </div>
+            </div>
+
+            <!-- Alertas -->
+            <div class="alerts-container" id="alertsContainer"></div>
+
+            <!-- Conteúdo Principal -->
+            <div class="main-content">
+                <!-- Formulário de Adicionar Gasto -->
+                <div class="card">
+                    <h3>➕ Adicionar Gasto</h3>
+                    <form id="expenseForm">
+                        <div class="form-group">
+                            <label for="description">Descrição</label>
+                            <input type="text" id="description" class="form-control" placeholder="Ex: Almoço no restaurante" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="amount">Valor (R$)</label>
+                            <input type="number" id="amount" class="form-control" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="card">Cartão</label>
+                            <select id="card" class="form-control" required>
+                                <option value="">Selecione o cartão</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <div class="category-select">
+                                <button type="button" class="category-btn" data-category="Alimentação">🍽️ Alimentação</button>
+                                <button type="button" class="category-btn" data-category="Transporte">🚗 Transporte</button>
+                                <button type="button" class="category-btn" data-category="Saúde">🏥 Saúde</button>
+                                <button type="button" class="category-btn" data-category="Educação">📚 Educação</button>
+                                <button type="button" class="category-btn" data-category="Lazer">🎮 Lazer</button>
+                                <button type="button" class="category-btn" data-category="Compras">🛒 Compras</button>
+                                <button type="button" class="category-btn" data-category="Casa">🏠 Casa</button>
+                                <button type="button" class="category-btn" data-category="Outros">📦 Outros</button>
+                            </div>
+                            <input type="hidden" id="category" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">💾 Adicionar Gasto</button>
+                    </form>
+                </div>
+
+                <!-- Lista de Gastos e Análises -->
+                <div>
+                    <!-- Filtros -->
+                    <div class="filter-tabs" id="filterTabs">
+                        <!-- Filtros serão gerados dinamicamente pelo JavaScript -->
+                    </div>
+
+                    <!-- Lista de Gastos -->
+                    <div class="card">
+                        <h3>📋 Últimos Gastos</h3>
+                        <div class="expense-list" id="expenseList">
+                            <!-- Gastos serão inseridos aqui pelo JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Análises -->
+                    <div class="card">
+                        <h3>📊 Análises</h3>
+                        <div class="analysis-tabs">
+                            <button class="analysis-tab active" data-analysis="summary">Resumo</button>
+                            <button class="analysis-tab" data-analysis="categories">Categorias</button>
+                            <button class="analysis-tab" data-analysis="cards">Cartões</button>
+                        </div>
+                        
+                        <div class="analysis-view">
+                            <!-- Resumo Mensal -->
+                            <div id="summaryAnalysis" class="analysis-content">
+                                <div class="summary-grid">
+                                    <div class="summary-card">
+                                        <h5>Total Gasto Este Mês</h5>
+                                        <p class="summary-value" id="totalMonth">R$ 0,00</p>
+                                    </div>
+                                    <div class="summary-card">
+                                        <h5>Média Diária</h5>
+                                        <p class="summary-value" id="dailyAverage">R$ 0,00</p>
+                                    </div>
+                                    <div class="summary-card">
+                                        <h5>Maior Gasto</h5>
+                                        <p class="summary-value" id="maxExpense">R$ 0,00</p>
+                                    </div>
+                                    <div class="summary-card">
+                                        <h5>Total de Transações</h5>
+                                        <p class="summary-value" id="totalTransactions">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Análise por Categorias -->
+                            <div id="categoriesAnalysis" class="analysis-content hidden">
+                                <div class="category-ranking" id="categoryRanking">
+                                    <!-- Rankings serão inseridos aqui -->
+                                </div>
+                            </div>
+                            
+                            <!-- Análise por Cartões -->
+                            <div id="cardsAnalysis" class="analysis-content hidden">
+                                <div class="category-ranking" id="cardRanking">
+                                    <!-- Rankings serão inseridos aqui -->
+                                </div>
+                            </div>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ Editar Gasto</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="editDescription">Descrição</label>
+                    <input type="text" id="editDescription" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="editAmount">Valor (R$)</label>
+                    <input type="number" id="editAmount" class="form-control" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCard">Cartão</label>
+                    <select id="editCard" class="form-control" required>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <div class="category-select">
+                        <button type="button" class="category-btn edit-category-btn" data-category="Alimentação">🍽️ Alimentação</button>
+                        <button type="button" class="category-btn edit-category-btn" data-category="Transporte">🚗 Transporte</button>
+                        <button type="button" class="category-btn edit-category-btn" data-category="Saúde">🏥 Saúde</button>
+                        <button type="button" class="category-btn edit-category-btn" data-category="Educação">📚 Educação</button>
+                        <button type="button" class="category-btn edit-category-btn" data-category="Lazer">🎮 Lazer</button>
+                        <button type="button" class="category-btn edit-category-btn" data-category="Compras">🛒 Compras</button>
+                        <button type="button" class="category-btn edit-category-btn" data-category="Casa">🏠 Casa</button>
+                        <button type="button" class="category-btn edit-category-btn" data-category="Outros">📦 Outros</button>
+                    </div>
+                    <input type="hidden" id="editCategory" required>
+                </div>
+                <input type="hidden" id="editId">
+                <button type="submit" class="btn btn-primary">💾 Salvar Alterações</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Perfil -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">⚙️ Perfil</h3>
+                <button class="modal-close" id="closeProfileModal">&times;</button>
+            </div>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label style="font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">Bancos ativos</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+                        <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="pf-bank" data-bank="Nubank"> Nubank</label>
+                        <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="pf-bank" data-bank="Itaú"> Itaú</label>
+                    </div>
+                </div>
+
+                <div id="profileBankDetails">
+                    <!-- Detalhes por banco serão inseridos via JS -->
+                </div>
+
+                <button type="submit" class="btn btn-primary">Salvar Perfil</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">👤 Criar Nova Conta</h3>
+                <button class="modal-close" id="closeRegisterModal">&times;</button>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="newUsername">Usuário</label>
+                    <input type="text" id="newUsername" class="form-control" placeholder="Escolha um usuário" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Senha</label>
+                    <input type="password" id="newPassword" class="form-control" placeholder="Escolha uma senha" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Senha</label>
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="Confirme a senha" required>
+                </div>
+                
+                <h4 style="margin: 1.5rem 0 0.5rem 0; color: var(--text-color); font-size: 1rem;">Escolha seus bancos:</h4>
+                <div class="form-group" id="bankSelection">
+                    <label style="font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">Selecione os bancos que deseja usar</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+                        <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="bank-checkbox" data-bank="Nubank"> Nubank</label>
+                        <label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" class="bank-checkbox" data-bank="Itaú"> Itaú</label>
+                    </div>
+                </div>
+
+                <h4 style="margin: 1rem 0 1rem 0; color: var(--text-color); font-size: 1rem;">Configurar Limites dos Cartões:</h4>
+                
+                <div id="bankLimitDetails">
+                    <!-- Detalhes por banco serão inseridos via JS -->
+                </div>
+                
+                <button type="submit" class="btn btn-primary">✨ Criar Conta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notificação -->
+    <div id="notification" class="notification"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
